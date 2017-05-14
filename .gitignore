@@ -1,0 +1,7 @@
+Mostly Python and Office file exclusions. -PW
+*.pyc
+*.log
+*.docx
+*.xlsx
+*.pttx
+.DS_Store
