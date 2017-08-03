@@ -1,140 +1,118 @@
 """'count_fasta.py' Written by Phil Wilmarth, OHSU.
-Copyright 2009, Oregon Health & Science University.
-All Rights Reserved.
 
-Permission to use, copy, modify, and distribute any part of this program
-for non-profit scientific research or educational use, without fee, and
-without a written agreement, is hereby granted, provided that the above
-copyright notice, and this license agreement appear in all copies.
-Inquiries regarding use of this software in commercial products or for
-commercial purposes should be directed to:
+The MIT License (MIT)
 
+Copyright (c) 2017 Phillip A. Wilmarth and OHSU
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+Direct questions to:
 Technology & Research Collaborations, Oregon Health & Science University,
-2525 SW 1st Ave, Suite 120, Portland, OR 97210
 Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
-
-IN NO EVENT SHALL OREGON HEALTH & SCIENCE UNIVERSITY BE LIABLE TO ANY
-PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES,
-INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS SOFTWARE.  THE
-SOFTWARE IS PROVIDED "AS IS", AND OREGON HEALTH &SCIENCE UNIVERSITY HAS
-NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES, OR ENHANCEMENTS.
-OREGON HEALTH & SCIENCE UNIVERSITY MAKES NO REPRESENTATIONS NOR EXTENDS
-WARRANTIES OF ANY KIND, EITHER IMPLIED OR EXPRESS, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
-PARTICULAR PURPOSE, OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE
-ANY PATENT, TRADEMARK OR OTHER RIGHTS.
 """
-#
-#
-#=============================
+# updated for Python 3 compatibility -PW 7/4/2017
+
+import os
+import sys
+import time
+import fasta_lib_Py3 as fasta_lib
+
+
 def fasta_counter(fasta_file):
-#=============================
     """Counts entries in a FASTA protein database.
-        Call with FASTA filename, returns integer protein count
+        Call with FASTA filename.
         Checks for duplicate accessions and (optional) valid characters.
     """
-    import os
-    import fasta_lib
-    #
-    print '==============================================================='
-    print ' count_fasta.py, v 1.01, written by Phil Wilmarth, OHSU, 2009.'
-    print '==============================================================='
-    #
     # create a log file to mirror screen output
-    #
     _folder = os.path.split(fasta_file)[0]
     log_obj = open(os.path.join(_folder, 'fasta_utilities.log'), 'a')
     write = [None, log_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: count_fasta.py', log_obj)
-    #
+    
     # create instances of reader object and protein object, initialize counters
-    #
     f = fasta_lib.FastaReader(fasta_file)
     p = fasta_lib.Protein()
     prot = 0
     head = 0
     conflict = {}
-    #
-    # read proteins until EOF
-    # NOTE: checking for errors slows program by factor of 3 or 4
-    #
+    
+    # read proteins until EOF; NOTE: checking for errors slows program by factor of 3-4
     while f.readNextProtein(p, check_for_errs=False):
-        #
+        
         # count protein sequences
-        #
         prot += 1   
         if (prot % 500000) == 0:
-            print '......(%s proteins read...)' % (prot,)
-        #
-        # check for duplicate accession
-        #
-        dup = conflict.get(p.accession, False)
-        if dup:
-            for obj in write:
-                print >>obj, '\n...WARNING: %s is already in FASTA database!\n' % \
-                      (p.accession,)
-                if p.molwtProtein(show_errs=False) == conflict[p.accession]:
-                    print >>obj, '......possible duplicated sequence...'
-        else:
-            conflict[p.accession] = p.molwtProtein(show_errs=False)
-        #
+            print('......(%s proteins read...)' % ("{0:,d}".format(prot),))
+        
+##        # check for duplicate accession
+##        dup = conflict.get(p.accession, False)
+##        if dup:
+##            for obj in write:
+##                print('\n...WARNING: %s is already in FASTA database!\n' % (p.accession,), file=obj)
+##                if p.molwtProtein(show_errs=False) == conflict[p.accession]:
+##                    print('......possible duplicated sequence...', file=obj)
+##        else:
+##            conflict[p.accession] = p.molwtProtein(show_errs=False)
+        
         # count number of header elements
-        #
-        control_A = p.description.count(chr(01))
+        control_A = p.description.count(chr(1))
         head = head + control_A + 1
-    #
+    
     # print results and return
-    #
     for obj in write:
-        print >>obj, '...there are %s proteins in %s' % \
-              (prot, os.path.split(fasta_file)[1])
+        print('...there are %s proteins in %s' % ("{0:,d}".format(prot), os.path.split(fasta_file)[1]), file=obj)
         if head > prot:
-            print >>obj, '...there were %s header lines' % (head,)
-    #
+            print('...there were %s header lines' % ("{0:,d}".format(head),), file=obj)
+    
     fasta_lib.time_stamp_logfile('>>> ending: count_fasta.py', log_obj)
-    log_obj.close()
-    #    
-    return(prot)
-    #
-    # end
-    #
-#
+    log_obj.close()    
+    return   
+
+
 # setup stuff: check for command line args, etc.
-#
 if __name__ == '__main__':
-    import os
-    import sys
-    import fasta_lib
-    #
-    # check if database name passed on command line
-    #
-    if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
-        fasta_file = sys.argv[1]
-    #
-    # if not, browse to database file
-    #    
+    # check if database name(s) passed on command line
+    if len(sys.argv) > 1:
+        fasta_files = sys.argv[1:]
+    
+    # if not, browse to database file    
     else:
-        if len(sys.argv) > 1:
-            print '...WARNING: %s not found...' % (sys.argv[1],)
-        database = r'C:\Xcalibur\database'
+        database = r'C:\Xcalibur\database'  # set a default to speed up browsing
         if not os.path.exists(database):
             database = os.getcwd()
-        fasta_file = fasta_lib.get_file(database, \
-                                        [('FASTA files', '*.fasta'),\
-                                         ('Zipped FASTA files', '*.gz'),\
-                                         ('All files', '*.*')],\
-                                        'Select a FASTA database')
-        if fasta_file == '': sys.exit()     # cancel button repsonse
-    #
-    # call counter function
-    #
-    fasta_counter(fasta_file)
-    try:    # wait for user to end program if not running from IDLE
-        # what __file__ is under XP IDLE: 'C:\\Python26\\Lib\\idlelib\\idle.pyw'
-        if not __file__.endswith('idle.pyw'):
-            raw_input('\n...hit any key to end program...')
-    except NameError:
-        pass
-#
+        fasta_files = fasta_lib.get_files(database,
+                                          [('FASTA files', '*.fasta'), ('Zipped FASTA files', '*.gz'), ('All files', '*.*')],
+                                          'Select a FASTA database')
+        if not fasta_files: sys.exit()     # cancel button repsonse
+
+    # print version info, etc. (here because of the loop)    
+    print('===============================================================')
+    print(' count_fasta.py, v 1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
+    print('===============================================================')
+    
+    # call counter function for each fasta file
+    print('start', time.ctime())
+    for fasta_file in fasta_files:
+        try:
+            fasta_counter(fasta_file)
+        except FileNotFoundError:     # FastaReader class raises exception if file not found
+            pass
+    print('end', time.ctime())
+
 # end
-#
