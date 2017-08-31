@@ -35,7 +35,7 @@ import fasta_lib_Py3 as fasta_lib
 
 # set minimum sequence counts here
 MIN_SEQUENCE_COUNT = 10      # minimum number of proteins per species
-EXPAND_GROUPS = False        # controls expanding taxonomy groups (nodes)
+EXPAND_GROUPS = True        # controls expanding taxonomy groups (nodes)
 MIN_GROUP_SEQ_COUNT = 10     # minimum if expanding a taxon group
 
 # extract only RefSeq entries if True
@@ -53,6 +53,8 @@ taxon_dict = { 9606:'human_refseq',
                9544:'Macaca.mulatta',
                83332: 'M_tuberculosis_H37Rv' } # default list of species
 
+taxon_dict = { 8459: 'Testudines_8459'}
+taxon_dict = { 8476: 'Terrapins_8476'}
 
 def main(taxon_dict):
     """Main program to extract entries by taxon ID from NCBI nr databases.
