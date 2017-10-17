@@ -1,4 +1,5 @@
 Mostly Python and Office file exclusions. -PW
+*.bak
 *.pyc
 *.log
 *.docx

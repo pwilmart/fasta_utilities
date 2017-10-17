@@ -111,12 +111,12 @@ for p in proteins:
 file_obj.close()
 
 # print out the report of oddball characters
-print("   TriTryp database:", os.path.basename(fasta_file))
-print("   translations that do not start with Met:", no_met)
-print("   translations that have premature stop codons:", stop_count)
-print("   translations that contain gaps:", gap_count)
-print("   total number of input sequences was:", pcount)
-print("   total number of sequences written was:", len(proteins))
-print("   number of redundant sequences was:", duplicates)
+print(("   TriTryp database:", os.path.basename(fasta_file)))
+print(("   translations that do not start with Met:", no_met))
+print(("   translations that have premature stop codons:", stop_count))
+print(("   translations that contain gaps:", gap_count))
+print(("   total number of input sequences was:", pcount))
+print(("   total number of sequences written was:", len(proteins)))
+print(("   number of redundant sequences was:", duplicates))
 
 # end

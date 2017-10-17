@@ -48,9 +48,9 @@ def parse_ensembl_header_line(line):
     return parsed['description:'] + extra
     
 # print program name and version
-print '=========================================================='
-print ' program Ensembl_fixer.py, v1.0, Phil Wilmarth, OHSU 2016 '
-print '=========================================================='
+print('==========================================================')
+print(' program Ensembl_fixer.py, v1.0, Phil Wilmarth, OHSU 2016 ')
+print('==========================================================')
 
 # browse to the database
 database_path = r"C:\Google_Drive\Databases"
@@ -89,7 +89,7 @@ while f.readNextProtein(p, check_for_errs=True):
     if p.accession in accessions:
         dup_count += 1
         accessions[p.accession] += 1
-        print '...WARNING: skipping duplicate accession:', p.accession
+        print('...WARNING: skipping duplicate accession:', p.accession)
         continue
     else:
         accessions[p.accession] = 1
@@ -136,23 +136,23 @@ for p in proteins:
     if len(p.sequence) > 0:
         p.printProtein(file_obj)
     else:
-        print 'zero sequence:', p.accession
+        print('zero sequence:', p.accession)
     fixcount += 1
 file_obj.close()
 
 # print out the report of oddball characters
-print "   Ensembl database:", os.path.basename(fasta_file)
-print "   translations that do not start with Met:", no_met
-print "   translations that have premature stop codons:", stop_count
-print "   translations that contain gaps:", gap_count
-print "   translations that contain X (unknowns):", X_count
-print "   translations that contain B:", B_count
-print "   translations that contain Z:", Z_count
-print "   translations that contain J:", J_count
-print "   translations that contain U:", U_count
-print "   total number of input sequences was:", pcount
-print "   total number of sequences written was:", fixcount
-print "   number of duplicate accessions was:", dup_count
+print("   Ensembl database:", os.path.basename(fasta_file))
+print("   translations that do not start with Met:", no_met)
+print("   translations that have premature stop codons:", stop_count)
+print("   translations that contain gaps:", gap_count)
+print("   translations that contain X (unknowns):", X_count)
+print("   translations that contain B:", B_count)
+print("   translations that contain Z:", Z_count)
+print("   translations that contain J:", J_count)
+print("   translations that contain U:", U_count)
+print("   total number of input sequences was:", pcount)
+print("   total number of sequences written was:", fixcount)
+print("   number of duplicate accessions was:", dup_count)
 #
 # end
 #
