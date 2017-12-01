@@ -1,14 +1,16 @@
-
 """Simple Ensembl (post v83) FASTA protein parsing/repair program.
 Truncates at stop codons, flags other odd things.
 Parses and reformats description strings.
 Written by Phil Wilmarth, OHSU, 2016
 #
 checks for duplicate accessions, too
+
+switched to regex in gene and transcript parsing to make it more general -PW 12/1/2017
 """ 
 
 import os
 import copy
+import re
 import fasta_lib
 
 # set up the list of possible tags in header lines
@@ -30,11 +32,17 @@ def parse_ensembl_header_line(line):
         parsed['description:'] = 'NO DESCRIPTION'
     extra = ' ('
     if 'gene:' in parsed:
-        extra += 'g:' + str(float(parsed['gene:'][7:]))
+        gene_number = re.sub(r'[A-Z0-9]+G', '', parsed['gene:'])    # get the numerial part
+        gene_number = re.sub(r'-', '.', gene_number)    # replace hyphens with decimal points
+        extra += 'g:' + str(float(gene_number))
+##        extra += 'g:' + str(float(parsed['gene:'][7:]))
     if 'transcript:' in parsed:
         if extra != ' (':
             extra += ', '
-        extra += 't:' + str(float(parsed['transcript:'][7:]))
+        transcript_number = re.sub(r'[A-Z0-9]+T', '', parsed['transcript:'])
+        transcript_number = re.sub(r'-', '.', transcript_number)
+        extra += 't:' + str(float(transcript_number))
+##        extra += 't:' + str(float(parsed['transcript:'][7:]))
     if 'gene_symbol:' in parsed:
         symbol = parsed['gene_symbol:']
         if extra != ' (':
