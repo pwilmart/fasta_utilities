@@ -47,7 +47,7 @@ KEEP_IPI_GENE_ID = False
 KEEP_UNIPROT_ID = True
 
 # flags to make different output databases
-MAKE_SEPARATE_FORWARD = False
+MAKE_SEPARATE_FORWARD = True
 MAKE_SEPARATE_REVERSED = False
 MAKE_SEPARATE_BOTH = True
 

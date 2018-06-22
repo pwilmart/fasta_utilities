@@ -5,4 +5,7 @@ Mostly Python and Office file exclusions. -PW
 *.docx
 *.xlsx
 *.pttx
+*.zip
 .DS_Store
+old_libraries/
+extra/
