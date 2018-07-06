@@ -30,7 +30,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 
 import os
 import sys
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # flag for case-sensitive matching (True) or not (False)
 CASE_SENSITIVE = True
@@ -56,15 +56,15 @@ def main(string_dict):
         Each matching protein is written once per output file with possible
             compound header (nr) of all headers containing matching patterns.
             If "cleaning" of accessions/descriptions is turned on for NCBI nr
-            databases, only the first header element will be retained and 
+            databases, only the first header element will be retained and
             any accession number cross-references will be lost.
-            
+
     Written by Phil Wilmarth, OHSU, 2009.
     """
     print('=====================================================================')
     print(' extract_by_string.py, v.1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('=====================================================================')
-    
+
     # set some file paths and names
     default = r'C:\Xcalibur\database'
     if not os.path.exists(default):
@@ -72,17 +72,17 @@ def main(string_dict):
     db_file = fasta_lib.get_file(default, [('Zipped files', '*.gz'), ('Fasta files', '*.fasta')],
                                  title_string='Select a FASTSA database')
     if db_file == '' : sys.exit() # cancel button repsonse
-    
+
     db_folder, db_name = os.path.split(db_file)
     base_name = db_name.replace('.gz', '')
     if not base_name.endswith('.fasta'):
         base_name = base_name + '.fasta'
-    
+
     # create a log file to mirror screen output
     log_obj = open(os.path.join(db_folder, 'fasta_utilities.log'), 'a')
     write = [None, log_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: extract_by_string.py', log_obj)
-    
+
     # print the list of patterns that will be extracted
     string_list = list(string_dict.items())
     string_list.sort()
@@ -90,7 +90,7 @@ def main(string_dict):
         print('...extracting entries containing these strings:', file=obj)
         for i, t in enumerate(string_list):
             print('......(%s) string "%s" to file ending in "%s"' % (i+1, t[0], t[1]), file=obj)
-    
+
     # open the output databases, initialize counters
     string_files = {}
     string_count = {}
@@ -103,7 +103,7 @@ def main(string_dict):
         name_count[name] = 0
     for name in string_files.keys():
         string_files[name] = open(string_files[name], 'w')
-    
+
     # create a FastaReader object, initialize counters, and start reading
     x = fasta_lib.FastaReader(db_file)
     prot = fasta_lib.Protein()
@@ -117,7 +117,7 @@ def main(string_dict):
         written = {}    # make sure protein is written only ONCE per OUTFILE
         header = prot.accession + ' ' + prot.description # recreate the '>' line
         if not CASE_SENSITIVE:  # convert to uppercase
-            header = header.upper() 
+            header = header.upper()
         for pattern in string_dict.keys():
             new_pattern = pattern
             if not CASE_SENSITIVE:  # case insensitive matching
@@ -132,13 +132,13 @@ def main(string_dict):
                     else:
                         written[name] = head
                         string_count[pattern] += 1
-        
+
         # write any matching proteins to appropriate out file
         for name in written.keys():
             name_count[name] += 1   # output file write counters
             f = string_files[name]  # output file pointers
             header = written[name]  # composite header of name's matches
-            
+
             # set the accession and description fields before writing
             prot.accession = header.split()[0]
             prot.new_acc = prot.accession
@@ -150,11 +150,11 @@ def main(string_dict):
                 elif prot.accession.startswith('sp|') or prot.accession.startswith('tr|'):
                     prot.parseUniProt(KEEP_UNIPROT_ID)
             prot.printProtein(f)    # write any matching proteins
-    
+
     # close files
     for f in string_files.values():
         f.close()
-    
+
     # print out the summary stuff
     for obj in write:
         print('...%s protein entries in %s' % ("{0:,d}".format(prot_read), db_name), file=obj)
@@ -170,9 +170,9 @@ def main(string_dict):
             temp = base_name.replace('.fasta', '_'+name+'.fasta')
             print('......(%s) %s proteins extracted and written to %s' %
                   (i+1, "{0:,d}".format(name_count[name]), temp), file=obj)
-    
+
     fasta_lib.time_stamp_logfile('>>> ending: extract_by_string.py', log_obj)
-    log_obj.close()   
+    log_obj.close()
     return
 
 # check for command line launch and see if any arguments passed
@@ -187,7 +187,3 @@ if __name__ == '__main__':
         main(string_dict)
 
 # end
-
-
-
-         

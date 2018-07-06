@@ -34,7 +34,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 
 import os
 import copy
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # print program name and version
 print('============================================================')
@@ -65,7 +65,7 @@ no_met = 0
 f = fasta_lib.FastaReader(fasta_file)
 while f.readNextProtein(p, check_for_errs=True):
     pcount += 1
-    
+
     # parse the description string into a dictionary
     items = [x.strip() for x in p.description.split('|') if x]
     header_dict = {x.split('=')[0]: x.split('=')[1] for x in items}
@@ -75,7 +75,7 @@ while f.readNextProtein(p, check_for_errs=True):
                 '[' + header_dict['organism'] + ']',
                 '(' + header_dict['protein_length'] + 'aa)']
     p.new_desc = ' '.join(new_desc)
-    
+
     # test for odd amino acids, stop codons, gaps
     if not p.sequence.startswith('M'):
         no_met += 1
@@ -89,7 +89,7 @@ while f.readNextProtein(p, check_for_errs=True):
     if '-' in p.sequence:
         gap_count += 1
         p.new_desc = p.new_desc + ' (Contains gaps)'
-    
+
     # save the protein in list
     proteins.append(copy.deepcopy(p))
 

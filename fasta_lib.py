@@ -48,7 +48,7 @@ import sqlite3
 import tkinter
 from tkinter import filedialog
 
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 def get_folder(default_location, title_string=None):
     """Dialog box to browse to a folder.  Returns folder path.

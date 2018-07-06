@@ -31,21 +31,21 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 import os
 import sys
 import copy
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 def main(fasta_file):
     """Checks entries in a FASTA protein database for identical duplicates.
         Call with FASTA filename, returns a couple of dictionaries
-    """    
+    """
     print('=======================================================================')
     print(' check_for_duplicates.py, v1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('=======================================================================')
-    
+
     # set up the output file names, etc.
     folder = os.path.split(fasta_file)[0]
     out_file = os.path.join(folder, 'duplicates.txt')
     out_obj = open(out_file, 'w')
-    
+
     # create instances of reader object and protein object, initialize counter
     f = fasta_lib.FastaReader(fasta_file)
     p = fasta_lib.Protein()
@@ -53,7 +53,7 @@ def main(fasta_file):
     head = 0
     dup = 0
     conflict = {}
-    
+
     # read proteins until EOF
     while f.readNextProtein(p, check_for_errs=False):
         prot += 1
@@ -67,14 +67,14 @@ def main(fasta_file):
             print('...WARNING: (protein no. %s) %s may be same as %s' % (prot, p.accession, duplicate), file=out_obj)
         else:
             conflict[dup_data] = value
-    
+
     # print result and return
     print('...there are %s proteins in %s' % (prot, os.path.split(fasta_file)[1]))
     if head > prot:
         print('...there were %s header lines...' % (head,))
     print('...there were %s possible duplicates...' % (dup,))
     out_obj.close()
-    
+
     # rewind out file and build new dictionaries
     out_obj = open(out_file, 'r')
     conflict = {}
@@ -89,7 +89,7 @@ def main(fasta_file):
         to_save[line[4]] = True
         to_save[line[9]] = True
     out_obj.close()
-    
+
     # read in and save the proteins that might be duplicates of each other
     candidates = []
     i = 0
@@ -106,7 +106,7 @@ def main(fasta_file):
         print('to_save_dictionary:', to_save)
         print('bailing out in middle')
         return(candidates, index)
-    
+
     # look deeper to see if candidates are actually duplicates
     out_obj = open(out_file, 'a')
     print('\n========================================\n', file=out_obj)
@@ -121,19 +121,19 @@ def main(fasta_file):
             exact_dup += 1
             print('...(%s) WARNING: %s exact match to %s' % (exact_dup, p_ref.accession, p_dup.accession), file=out_obj)
     print('...number of exact matches was', exact_dup)
-    
+
     return(candidates, index)
     # end
-    
+
 
 # setup stuff: check for command line args, etc.
 if __name__ == '__main__':
-    
+
     # check if database name passed on command line
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
         fasta_file = sys.argv[1]
-    
-    # if not, browse to database file   
+
+    # if not, browse to database file
     else:
         if len(sys.argv) > 1:
             print('...WARNING: %s not found...' % (sys.argv[1],))
@@ -144,9 +144,8 @@ if __name__ == '__main__':
                                         [('FASTA files', '*.fasta'), ('Zipped FASTA files', '*.gz'), ('All files', '*.*')],
                                         'Select a FASTA database')
         if fasta_file == '': sys.exit()     # cancel button repsonse
-    
+
     # call main function
     candidates, index = main(fasta_file)
 
 # end
-

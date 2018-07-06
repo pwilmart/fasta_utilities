@@ -31,7 +31,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 import os
 import sys
 import copy
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # set minimum sequence counts here
 MIN_SEQUENCE_COUNT = 10      # minimum number of proteins per species
@@ -73,7 +73,7 @@ def main(taxon_dict):
     print('====================================================================')
     print(' nr_extract_taxon.py, v.1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('====================================================================')
-    
+
     # set some file paths and names
     default = r'C:\Xcalibur\database'
     if not os.path.exists(default):
@@ -82,19 +82,19 @@ def main(taxon_dict):
                                  [('Zipped files', '*.gz'), ('Fasta files', '*.fasta')],
                                  title_string='Select an NCBI nr database')
     if nr_file == '': sys.exit() # cancel button response
-    
+
     ncbi_folder, nr_name = os.path.split(nr_file)
     nr_db = os.path.splitext(nr_name)[0]
-    
+
     # create a log file to mirror screen output
     log_obj = open(os.path.join(ncbi_folder, 'fasta_utilities.log'), 'a')
     write = [None, log_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: nr_extract_taxon.py', log_obj)
-    
+
     # get the saved gi number to taxon number {int:int} dictionary
     acc_to_taxon = fasta_lib.AccToTaxon(ncbi_folder)
     acc_to_taxon.create_or_load(ncbi_folder)
-    
+
     # print the list of taxon numbers that will be extracted
     original_dict = taxon_dict
     taxon_list = list(taxon_dict.items())
@@ -103,14 +103,14 @@ def main(taxon_dict):
         print('...extracting these taxon numbers:', file=obj)
         for i, t in enumerate(taxon_list):
             print('......(%s) taxon %s to file tagged with "%s"' % (i+1, t[0], t[1]), file=obj)
-    
+
     # expand any group taxon numbers.  NOTE: if a taxon number appears in
     # "nr_fasta_analyze.txt", it will not be expanded.  Either delete the
     # line in "nr_fasta_analyze.txt", or make an expanded "taxon_dict" by hand.
     if EXPAND_GROUPS:
         fasta_lib.expand_species(ncbi_folder, 'nr', taxon_dict, MIN_SEQUENCE_COUNT,
                                  MIN_GROUP_SEQ_COUNT, REF_SEQ_ONLY)
-    
+
     # open the output databases, initialize counters, etc.
     taxon_files = {}
     taxon_count = {}
@@ -121,11 +121,11 @@ def main(taxon_dict):
         taxon_files[name] = fname
         name_count[name] = 0
         taxon_count[taxon] = 0
-    
+
     # open the output filenames
     for name in taxon_files.keys():
         taxon_files[name] = open(taxon_files[name], 'w')
-    
+
     # loop over all proteins in nr
     x = fasta_lib.FastaReader(nr_file)
     prot = fasta_lib.Protein()
@@ -134,7 +134,7 @@ def main(taxon_dict):
     skipped = 0
     for obj in write:
         print('...reading %s and extracting entries...' % (nr_name,), file=obj)
-    
+
     # checking for errors slows down program by about a factor of 3 or 4
     while x.readNextProtein(prot, check_for_errs=False):
         prot_read += 1
@@ -143,7 +143,7 @@ def main(taxon_dict):
         written = {}
         line = prot.accession + ' ' + prot.description
         prot.new_desc = ''
-        
+
         # extract the gi numbers for each header
         for header in line.split(chr(1)):
             accession_with_version = header.split()[0]
@@ -151,7 +151,7 @@ def main(taxon_dict):
             if REF_SEQ_ONLY and '_' not in accession:
                 continue    # skip proteins without RefSeq entries
             taxon = acc_to_taxon.get(accession, False)
-            
+
             # see if taxon number for this gi is in our desired list
             if taxon:
                 if taxon_dict.get(taxon, False):
@@ -174,8 +174,8 @@ def main(taxon_dict):
             else:
                 not_found += 1
                 continue
-        
-        # write a protein sequence for each taxon number it was matched to       
+
+        # write a protein sequence for each taxon number it was matched to
         for taxon in written.keys():
             name = taxon_dict[taxon]
             f = taxon_files[name]
@@ -185,7 +185,7 @@ def main(taxon_dict):
             if CLEAN_ACCESSIONS:
                 prot.parseNCBI(REF_SEQ_ONLY)
             prot.printProtein(f)
-    
+
     # print out number of matches and close files
     for obj in write:
         print('...%s proteins in %s' % ("{0:,d}".format(prot_read), nr_name), file=obj)
@@ -206,7 +206,7 @@ def main(taxon_dict):
         for i, name in enumerate(names):
             print('......(%s) %s proteins extracted and written to %s' %
                   (i+1, "{0:,d}".format(name_count[name]), nr_db+'_'+name+'.fasta'), file=obj)
-    
+
     fasta_lib.time_stamp_logfile('>>> ending: nr_extract_taxon.py', log_obj)
     log_obj.close()
     for f in taxon_files.values():
@@ -227,8 +227,3 @@ if __name__ == '__main__':
         main(taxon_dict)
 
 # end
-    
-
-
-
-         

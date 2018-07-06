@@ -30,7 +30,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 
 import os
 import sys
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # set minimum sequence counts here
 MIN_SEQUENCE_COUNT = 10      # minimum number of proteins per species
@@ -75,7 +75,7 @@ def main(taxon_dict):
     print('============================================================================')
     print(' uniprot_extract_from_one.py, v.1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('============================================================================')
-    
+
     # set some file paths and names
     default = r'C:\Xcalibur\database'
     if not os.path.exists(default):
@@ -84,23 +84,23 @@ def main(taxon_dict):
                                       [('Zipped files', '*.gz'), ('Fasta files', '*.fasta')],
                                       title_string = 'Select an Sprot or Trembl database')
     if uniprot_file == '' : sys.exit() # cancel button repsonse
-    
+
     uniprot_folder, uniprot_name = os.path.split(uniprot_file)
     version = uniprot_name.split('_')[-1]
     version = version.replace('.fasta.gz', '')
     uniprot_db = uniprot_name.split('_')[1]
-    
+
     # create a log file to mirror screen output
     log_obj = open(os.path.join(uniprot_folder, 'fasta_utilities.log'), 'a')
     write = [None, log_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: uniprot_extract_from_one.py', log_obj)
-    
+
     # make the smaller uniprot dictionaries
     (sci_to_taxon, id_to_taxon) = fasta_lib.make_uniprot_to_taxon(uniprot_folder)
-    
+
     # make the more complete dictionary
     name_to_taxon = fasta_lib.make_all_names_to_taxon(uniprot_folder)
-    
+
     # print the list of taxon numbers that will be extracted
     taxon_list = list(taxon_dict.items())
     taxon_list.sort()
@@ -113,7 +113,7 @@ def main(taxon_dict):
     # NOTE: Any taxon numbers present in analysis text file will not be expanded.
     if EXPAND_GROUPS:
         fasta_lib.expand_species(uniprot_folder, uniprot_db, taxon_dict, MIN_SEQUENCE_COUNT, MIN_GROUP_SEQ_COUNT)
-    
+
     # inititalize dictionaries and counters
     taxon_files, taxon_count, name_count = {}, {}, {}
     for taxon, name in taxon_dict.items():
@@ -122,11 +122,11 @@ def main(taxon_dict):
         taxon_files[name] = fname
         taxon_count[taxon] = 0
         name_count[name] = 0
-    
+
     # open the output filenames
     for name in taxon_files.keys():
         taxon_files[name] = open(taxon_files[name], 'w')
-    
+
     # create a FastaReader object, initialize counters, and start reading
     x = fasta_lib.FastaReader(uniprot_file)
     prot = fasta_lib.Protein()
@@ -135,13 +135,13 @@ def main(taxon_dict):
     duplicates = {}
     for obj in write:
         print('...reading %s and extracting entries...' % (uniprot_name,), file=obj)
-    
+
     # checking for errors in sequences slows program execution, use as needed
     while x.readNextProtein(prot, check_for_errs=False):
         prot_read += 1
         if (prot_read % 500000) == 0:
             print('......(%s proteins read...)' % ("{0:,d}".format(prot_read),))
-        (spec_id, spec_name) = fasta_lib.uniprot_parse_line(prot.accession + ' ' + prot.description)    
+        (spec_id, spec_name) = fasta_lib.uniprot_parse_line(prot.accession + ' ' + prot.description)
         taxon = sci_to_taxon.get(spec_name, 0) # first choice mapping
         taxon2 = name_to_taxon.get(spec_name, 0) # alternative mapping
         if taxon == 0:  # first choice not present
@@ -166,13 +166,13 @@ def main(taxon_dict):
     # close the extracted database files
     for f in taxon_files.values():
         f.close()
-    
+
     # print list of mis-matching taxon number warnings
     if MISMATCHES:
         for i, (name, pair) in enumerate(duplicates.items()):
             for obj in write:
                 print('......(%s) WARNING: %s and %s map to "%s"' % (i+1, pair[0], pair[1], name), file=obj)
-    
+
     # print out the summary stuff
     for obj in write:
         print('...%s protein entries in %s' % ("{0:,d}".format(prot_read), uniprot_name), file=obj)
@@ -191,7 +191,7 @@ def main(taxon_dict):
             print('......(%s) %s proteins extracted and written to %s' %
                   (i+1, "{0:,d}".format(name_count[name]),
                    uniprot_db + '_' + version + '_' + name + '.fasta'), file=obj)
-    
+
     fasta_lib.time_stamp_logfile('>>> ending: uniprot_extract_from_one.py', log_obj)
     log_obj.close()
     return
@@ -208,6 +208,3 @@ if __name__ == '__main__':
         main(taxon_dict)
 
 # end
-
-
-         

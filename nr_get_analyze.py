@@ -32,7 +32,7 @@ import os
 import sys
 import time
 import gzip
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # minimum sequence count cutoff for output table
 # NOTE: There are a LOT of species with less than 10 sequences
@@ -49,26 +49,26 @@ def main(db, folder):
     can be loaded into EXCEL or a word processor.
     """
     global min_sequence_count
-    
+
     print('================================================================')
     print(' nr_get_analyze.py, v1.1.0, written by Phil Wilmarth, OHSU, 2017')
     print('================================================================')
-    
+
     # create a log file to mirror screen output
     log_obj = open(os.path.join(folder, 'fasta_utilities.log'), 'a')
     write = [None, log_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: nr_get_analyze.py', log_obj)
-    
+
     # make sure the files are present or download if not
     fasta_lib.download_ncbi(folder)
-    
+
     # make gi_to_taxon object (or reload from disk)
     acc_to_taxon = fasta_lib.AccToTaxon(folder)
     acc_to_taxon.create_or_load(folder)
-    
+
     # make a dictionary of taxon IDs to species names
     taxon_to_name = fasta_lib.make_taxon_to_sci_name(folder)
-    
+
     # make the taxon frequency dictionary for the proteins in nr.gz
     nr_name = os.path.split(folder)[1] + '.gz'
     for obj in write:
@@ -107,22 +107,22 @@ def main(db, folder):
             for tax in tax_list:
                 fasta_lib.add_or_increment(tax, taxon_freq)
             for reftax in reftax_list:
-                fasta_lib.add_or_increment(reftax, reftax_freq)                
-    
+                fasta_lib.add_or_increment(reftax, reftax_freq)
+
     # make the name frequency dictionary from the taxon frequency dictionary
     name_freq = {}
     for (taxon, freq) in taxon_freq.items():
         unknown_name = 'Unknown_taxonID_%s' % (taxon,)
         name_freq[taxon_to_name.get(taxon, unknown_name)] = freq
-    
+
     # make an inverted name_to_taxon dictionary
     name_to_taxon = {}
     for (number, name) in taxon_to_name.items():
         name_to_taxon[name] = number
-    
+
     # sort the species names and write to file
     fasta_lib.save_species_info_nr(folder, name_freq, name_to_taxon, reftax_freq, min_sequence_count)
-    
+
     # print out some stats and exit
     for obj in write:
         if prot > 0:
@@ -132,7 +132,7 @@ def main(db, folder):
         print('...%s were RefSeq entries...' % ("{0:,d}".format(ref_prot),), file=obj)
         print('...%s entries had undefined taxon ID numbers...' % ("{0:,d}".format(undef_gi),), file=obj)
         print('...there were', "{0:,d}".format(len(name_freq)), 'species names...', file=obj)
-    
+
     fasta_lib.time_stamp_logfile('>>> ending: nr_get_analyze.py', log_obj)
     log_obj.close()
     return
@@ -140,23 +140,23 @@ def main(db, folder):
 
 if __name__ == '__main__':
     # get the path to nr.gz and call main function to download, etc.
-    
+
     # check if nr.gz file path is passed on command line
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
         selection = sys.argv[1]
-        
+
     # if not, browse to a folder for nr downloads
-    else:        
+    else:
         database = r'C:\Xcalibur\database'
         if not os.path.exists(database):
             database = os.getcwd()
         selection = fasta_lib.get_folder(database, 'Select folder for nr downloads')
         if selection == '': sys.exit() # cancel button response
-    
+
     # if folder name starts with 'nr_', then skip creating a new folder
     if os.path.split(selection)[1].startswith('nr_'):
         main('nr', selection)
-    
+
     # otherwise create a new folder with date stamp
     else:
         curr_time = time.localtime()
@@ -167,9 +167,3 @@ if __name__ == '__main__':
         main('nr', folder)
 
 # end
-
-
-                
-    
-
-

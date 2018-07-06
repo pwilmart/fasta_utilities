@@ -30,7 +30,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 
 import os
 import sys
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 # minimum sequence count cutoff for output table
 min_sequence_count = 0

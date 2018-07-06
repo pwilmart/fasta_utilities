@@ -31,7 +31,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 import os
 import sys
 import tarfile
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 
 def main(node_taxon):
@@ -40,7 +40,7 @@ def main(node_taxon):
     print('=======================================================================')
     print(' taxon_group_analyzer.py, v1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('=======================================================================')
-    
+
     # get the name of the database analysis text file
     default = r'C:\Xcalibur\database'
     if not os.path.exists(default):
@@ -48,15 +48,15 @@ def main(node_taxon):
     ext_list = [('Text files', '*.txt'), ('All files', '*.*')]
     analysis_file = fasta_lib.get_file(default, ext_list, 'Select a species analysis file')
     if analysis_file == '': sys.exit() # cancel button response
-    
-    analysis_folder, short_file = os.path.split(analysis_file)    
+
+    analysis_folder, short_file = os.path.split(analysis_file)
     print('...making taxonomy nodes dictionary...')
 
     # may need to check if this works in Python 3
     archive_name = os.path.join(analysis_folder, 'taxdump.tar.gz')
     archive = tarfile.open(archive_name)
     nodes = archive.extractfile('nodes.dmp')
-    
+
     # read file and save taxon to parent taxon mappings
     taxon_to_parent = {}
     while True:
@@ -68,9 +68,9 @@ def main(node_taxon):
         else:
             line = line.rstrip()
         item = line.split('\t|\t')
-        taxon_to_parent[int(item[0])] = int(item[1])    
+        taxon_to_parent[int(item[0])] = int(item[1])
     nodes.close()
-    
+
     # open the fasta_analysis.txt file and find group members
     print('...scanning %s file...' % (short_file,))
     fasta_analyze = open(analysis_file, 'r')
@@ -86,7 +86,7 @@ def main(node_taxon):
         if not line:
             break
         else:
-            line = line.rstrip()    
+            line = line.rstrip()
         tree = [] # list of taxon number lineage
         parent = line.split('\t')[1]
         try:
@@ -112,7 +112,7 @@ def main(node_taxon):
 
 # check for command line launch and see if a taxonomy number was passed
 if __name__ == '__main__':
-    
+
     # if arguments make sure it is an integer
     node_taxon = 0
     if len(sys.argv) > 1:
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             node_taxon = int(sys.argv[1])
         except:
             pass
-    
+
     # if no argument or improper argument, ask for taxon number
     if not node_taxon:
         node_taxon = input('... enter a taxon node ID number > ')

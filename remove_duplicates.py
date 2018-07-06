@@ -30,7 +30,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 import os
 import sys
 import copy
-import fasta_lib_Py3 as fasta_lib
+import fasta_lib
 
 
 def find_identities(prot, candidates, skip, fasta_file, out_obj):
@@ -59,7 +59,7 @@ def main(fasta_file):
     print(' remove_duplicates.py, v1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
     print('====================================================================')
     print('\n   Analysis results will be written to "duplicates.txt"')
-    
+
     # set up the output file names, etc.
     folder = os.path.split(fasta_file)[0]
     out_file = os.path.join(folder, 'duplicates.txt')
@@ -73,14 +73,14 @@ def main(fasta_file):
     write = [None, out_obj]
     fasta_lib.time_stamp_logfile('\n>>> starting: check_for_duplicates.py', out_obj)
     #
-    
+
     # create instances of reader object and protein object, initialize counters
     f = fasta_lib.FastaReader(fasta_file)
     p = fasta_lib.Protein()
     prot, head, dup = 0, 0, 0
     candidates = {}     # dictionary of acc:protein lists
     conflicts = {}      # keeps track of seq len and MW
-    
+
     # read proteins until EOF
     while f.readNextProtein(p, check_for_errs=False):
         prot += 1
@@ -96,12 +96,12 @@ def main(fasta_file):
                 candidates[duplicate] = [copy.deepcopy(p)]
         else:
             conflicts[dup_data] = p.accession
-    
+
     # get list of proteins to test for identity
     to_test = {}
     for key in candidates.keys():
-        to_test[key] = True    
-    
+        to_test[key] = True
+
     # copy proteins to "nr" file, checking for duplicates
     dup = 0
     skip = {}
@@ -114,7 +114,7 @@ def main(fasta_file):
         if skip.get(p.accession, False):
             continue
         p.printProtein(nr_obj)
-    
+
     for obj in [None, out_obj]:
         print('\nThere were', prot, 'total sequences in:', os.path.basename(fasta_file), file=obj)
         print('There were', dup, 'identical sequences removed\n\n', file=obj)
@@ -130,8 +130,8 @@ if __name__ == '__main__':
     # check if database name passed on command line
     if len(sys.argv) > 1 and os.path.exists(sys.argv[1]):
         fasta_file = sys.argv[1]
-    
-    # if not, browse to database file   
+
+    # if not, browse to database file
     else:
         if len(sys.argv) > 1:
             print('...WARNING: %s not found...' % (sys.argv[1],))
@@ -142,7 +142,7 @@ if __name__ == '__main__':
                                         [('FASTA files', '*.fasta'), ('Zipped FASTA files', '*.gz'), ('All files', '*.*')],
                                         'Select a FASTA database')
         if fasta_file == '': sys.exit()     # cancel button repsonse
-    
+
     # call main function
     main(fasta_file)
 
