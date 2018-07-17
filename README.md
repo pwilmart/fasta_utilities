@@ -20,3 +20,7 @@
 - uniprot_extract_from_both.py - extracts species by taxonomy number from Swiss-Prot + TrEMBL databases
 - uniprot_extract_from_one.py - extracts species by taxonomy number from Swiss-Prot databases
 - uniprot_get_analyze.py - downloads and analyzes UniProt Swiss-Prot + TrEMBL releases
+
+
+## Utility scripts have been re-written for Python 3.
+The documentation (*.doc) files are out-of-date and have references to Python 2.7. An updated set of documentation is on the to-do list. Many utilities are the same (and function similarly) to what is described in the documentation. There are some new utilities and some new functionality to support newer options available at sources like UniProt and to handle changes in FASTA description/accession formats (NCBI and Ensembl).
