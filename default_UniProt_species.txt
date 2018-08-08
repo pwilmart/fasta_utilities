@@ -1,0 +1,7 @@
+[9606, 20975, 72588, 'Eukaryota', 'Homo sapiens (Human)']
+[9823, 23235, 17549, 'Eukaryota', 'Sus scrofa (Pig)']
+[9940, 21221, 1914, 'Eukaryota', 'Ovis aries (Sheep)']
+[10090, 22276, 38439, 'Eukaryota', 'Mus musculus (Mouse)']
+[10116, 21432, 10139, 'Eukaryota', 'Rattus norvegicus (Rat)']
+[83333, 4313, 11, 'Bacteria', 'Escherichia coli (strain K12)']
+[559292, 6049, 28, 'Eukaryota', "Saccharomyces cerevisiae (strain ATCC 204508 / S288c) (Baker's yeast)"]
