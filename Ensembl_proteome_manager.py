@@ -367,6 +367,7 @@ class GUI:
         self.search_species.delete(0, END)
         self.search_tax.delete(0, END)
         self.reverse_contams.uncheck_all()
+        self.get_filtered_proteome_list()
 
     def browse_contams(self):
         """Dialog to browse to non-default contaminants database."""
@@ -597,6 +598,7 @@ class GUI:
 
         # chdir into correct folder and make sure all file paths are set up correctly
         contam_location = self.contams_database
+        print('contams:', contam_location)
         ensembl_dir_name = r"Ensembl_v{}".format(self.release)
         os.chdir(os.path.join(self.abs_dl_path, ensembl_dir_name))
         
@@ -705,11 +707,11 @@ class GUI:
 
         # Entry mover-thingy Frame
         ## Main Frame
-        entry_frame = LabelFrame(self.root, text="Entries")
+        entry_frame = LabelFrame(self.root, text="Ensembl Databases")
         entry_frame.pack(side=TOP, fill=BOTH, expand=YES, padx=5, pady=5)
 
         ## Left Window
-        left_tree_frame = LabelFrame(entry_frame, text="Reference Proteomes")
+        left_tree_frame = LabelFrame(entry_frame, text="Ensembl Proteomes")
         left_tree_frame.pack(fill=BOTH, expand=YES, side=LEFT, padx=5, pady=10)
 
         # Create TreeView
