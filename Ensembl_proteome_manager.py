@@ -121,7 +121,7 @@ class GUI:
         self.script_location = script_location  # Script path location
         self.contams_database = os.path.join(self.script_location, default_contams)
         self.selected_default = os.path.join(script_location, 'default_Ensembl_species.txt')     # typical default species file path
-        self.data = None                        # Holds unpickled information
+        self.data = None                        # Holds unpickled information saved from last session
         self.quit_save_state = "not triggered"  # Trigger for updating defaults file on quit status
         
         # List of characters that cannot be in folder names
@@ -196,10 +196,10 @@ class GUI:
         self.data = self.unpickle_entries()
         self.release = self.data["Release"]
         self.version = "v{}".format(self.release)
-        self.animal_list = self.data["Entries"]
 
         # if pickled version matches current database version, then load entries from pickle file
         if self.release == release:
+            self.animal_list = self.data["Entries"]
             return True
         else:
             print('saved release is out-of-date')
