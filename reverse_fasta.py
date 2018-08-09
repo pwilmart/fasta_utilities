@@ -49,10 +49,11 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     if "both", make concatenated target/decoy with contaminants.
     "contam_path" is optional fullpath name of a contaminants database to use instead of default
     """
-    print('REV - contams:', contam_path)
     decoy_string = 'REV_'   # the string to denote decoy sequences
-    ###################################### Change contaminants file name here:
+    ######################################
+    # Change default contaminants file name here:
     CONTAMS = 'Thermo_contams_fixed.fasta'
+    # or pass in a "contams_path"
     ######################################
     
     # open the "forward" and "reversed" output files

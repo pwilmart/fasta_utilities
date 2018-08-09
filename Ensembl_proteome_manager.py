@@ -405,7 +405,6 @@ class GUI:
         selection = self.tree_right.selection()  # creates sets with elements "I001", etc.
         
         for selected in selection:
-            selected_copy = self.tree_right.item(selected)  # creates a set of dicts
             self.tree_right.delete(selected)
         self.update_status_bar("{} dropped".format(selected_copy['values'][0]))
 
@@ -413,9 +412,9 @@ class GUI:
         """Movies entry(ies) from left treeview to right."""
         selection = self.tree_left.selection()  
 
-        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()]     
+        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()] # contents of right rows    
         for selected in selection:
-            selected_copy = self.tree_left.item(selected)
+            selected_copy = self.tree_left.item(selected) # contents of left selection
             if not selected_copy in right_tree_data:
                 self.tree_right.insert('', 'end', values=selected_copy['values'])
         self.update_status_bar("{} added".format(selected_copy['values'][0]))  # Species name should be first

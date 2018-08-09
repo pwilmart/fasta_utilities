@@ -419,7 +419,6 @@ class GUI:
         selection = self.tree_right.selection()  # Creates sets with elements "I001", etc.
         
         for selected in selection:
-            selected_copy = self.tree_right.item(selected)  # Creates a set of dicts
             self.tree_right.delete(selected)
         try:
             self.update_status_bar("{} dropped".format(selected_copy['values'][-1]))
@@ -430,9 +429,9 @@ class GUI:
         """Movies entry(ies) from left treeview to right."""
         selection = self.tree_left.selection()  
         
-        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()]     
+        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()]  # contents of right rows   
         for selected in selection:
-            selected_copy = self.tree_left.item(selected)
+            selected_copy = self.tree_left.item(selected) # contents of left selection
             if not selected_copy in right_tree_data:
                 self.tree_right.insert('', 'end', values=selected_copy['values'])
         try:
@@ -560,10 +559,6 @@ class GUI:
             both = True
         if target_contams:
             forward = True
-
-##        # no longer have option for target/decoy without contams
-##        if not contams:
-##            contam_location = os.path.join(contam_location, "block")  # Prevent script from finding contams file
 
         if decoy_contams or target_contams:        
             reverse_fasta.main(fasta_file, forward, reverse, both, contam_path=contam_location)
