@@ -8,6 +8,7 @@ Mostly Python and Office file exclusions. -PW
 *.zip
 *.pickle
 default_Ensembl_species.txt
+to_do_list.py
 .DS_Store
 old_libraries/
 extra/

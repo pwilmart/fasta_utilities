@@ -167,7 +167,7 @@ class ReadMeEntry:
 class GUI:
     """Main GUI class for application.
     """
-    def __init__(self, url, ref_prot_path, kingdom_paths, headers, banned_list, script_path):
+    def __init__(self, url, ref_prot_path, kingdom_paths, headers, banned_list, script_path, default_contams):
         """Create object and set some state attributes."""
         self.url = url                          # Url of UniProt FTP site
         self.ftp = None                         # FTP object (set in login method)
@@ -181,6 +181,7 @@ class GUI:
         self.proteome_IDs = []                  # List of unique proteome IDs
         self.selected_default = os.path.join(script_path, 'default_UniProt_species.txt')     # typical default species file path
         self.script_path = script_path          # Path location of script
+        self.contams_database = os.path.join(self.script_path, default_contams)
         self.abs_download_path = ""             # Absolute path of user selected download directory
         self.data = None                        # Data from pickle file (UniProt reference proteome entries and release date)
         self.quit_save_state = False            # Flag set if user wants to save database after quitting program
@@ -380,6 +381,14 @@ class GUI:
         self.reverse_contams.uncheck_all()
         self.search_species.delete(0, END)
         self.search_tax.delete(0, END)
+        self.get_filtered_proteome_list()
+
+    def browse_contams(self):
+        """Dialog to browse to non-default contaminants database."""
+        self.contams_database = fasta_lib.get_file(self.script_path,
+                                                   [('Fasta files', '*.fasta')],
+                                                    "Select a contaminants FASTA file")
+        self.contams_label.config(text=os.path.split(self.contams_database)[1])
         
     def sort_text_column(self, tv, col, reverse=False):
         """Sorts entries in treeview tables alphabetically."""
@@ -405,27 +414,27 @@ class GUI:
         # Reverse sort next time
         tv.heading(col, command=lambda col_=col: self.sort_num_column(tv, col_, not reverse))
     
-    def move_to_left(self):
+    def drop_from_right(self):
         """Movies entry(ies) from right treeview to left."""
         selection = self.tree_right.selection()  # Creates sets with elements "I001", etc.
         
         for selected in selection:
             selected_copy = self.tree_right.item(selected)  # Creates a set of dicts
             self.tree_right.delete(selected)
-            self.tree_left.insert('', 'end', values=selected_copy['values'])
         try:
             self.update_status_bar("{} dropped".format(selected_copy['values'][-1]))
         except UnboundLocalError:
             print("User tried to remove a proteome even though none was selected!")
 
-    def move_to_right(self):
+    def copy_to_right(self):
         """Movies entry(ies) from left treeview to right."""
         selection = self.tree_left.selection()  
         
+        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()]     
         for selected in selection:
             selected_copy = self.tree_left.item(selected)
-            self.tree_left.delete(selected)
-            self.tree_right.insert('', 'end', values=selected_copy['values'])
+            if not selected_copy in right_tree_data:
+                self.tree_right.insert('', 'end', values=selected_copy['values'])
         try:
             self.update_status_bar("{} added".format(selected_copy['values'][-1]))  # Species name should be last
         except UnboundLocalError:
@@ -702,7 +711,7 @@ class GUI:
         
         # Add forward/reverse/contams
         for file in combined_files:
-            self.database_processing(file, self.script_path) # assumes contams FASTA file in location with script
+            self.database_processing(file, self.contams_database)
                         
     def update_status_bar(self, _text):
         """Updates status bar with new text"""
@@ -744,7 +753,7 @@ class GUI:
 
         # Search Window
         ## Main Frame
-        search_window_frame = LabelFrame(option_frame, text="Additional Filters")
+        search_window_frame = LabelFrame(option_frame, text="Additional Filters:")
         search_window_frame.pack(side=TOP, fill=BOTH, expand=YES, padx=5, pady=5)
 
         # Create search bars/buttons
@@ -771,11 +780,19 @@ class GUI:
         clear_button.pack(side=RIGHT, padx=10, pady=10)
 
         # Checkboxes for contams and/or decoy databases
-        add_seq_frame = LabelFrame(option_frame, text="Additional Database Processing")
+        add_seq_frame = LabelFrame(option_frame, text="Create Additional Databases:")
         add_seq_frame.pack(fill=X, padx=5, pady=5)
         
         self.reverse_contams = CheckBoxes(add_seq_frame, ["Target+Decoy w/Contams", "Target w/Contams"])
         self.reverse_contams.pack(side = LEFT, fill=X, padx=5, pady=5)
+
+        # option to change the contams database
+        contams_frame = Frame(option_frame)
+        contams_frame.pack(fill=BOTH, expand=YES, padx=10, pady=5)
+        self.contams_label = Label(contams_frame, text=os.path.split(self.contams_database)[1])
+        self.contams_label.pack(side=LEFT, padx=5, pady=5)
+        contams_button = Button(contams_frame, text="Change Contaminants Database", command=self.browse_contams)
+        contams_button.pack(side=LEFT, padx=5, pady=5)
 
         # Entry mover-thingy Frame
         ## Main Frame
@@ -825,7 +842,7 @@ class GUI:
         button_names = ["Add Proteome(s)", "Drop Proteome(s)",
                         "Save Default Species", "Load Default Species",
                         "Download", "Quit"]
-        button_commands = [self.move_to_right, self.move_to_left,
+        button_commands = [self.copy_to_right, self.drop_from_right,
                            self.save_defaults, self.select_defaults_and_load,
                            self.download_databases, self.quit_gui]
         btn_width = 18
@@ -895,8 +912,9 @@ if __name__ == '__main__':
 
     # get location where script is launched from on local computer
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+    DEFAULT_CONTAMS = 'Thermo_contams_fixed.fasta'
     
-    gui = GUI(URL, REF_PROT_PATH, KINGDOM_PATHS, HEADERS, BANNED, SCRIPT_PATH)
+    gui = GUI(URL, REF_PROT_PATH, KINGDOM_PATHS, HEADERS, BANNED, SCRIPT_PATH, DEFAULT_CONTAMS)
     gui.create_gui()
 
 # End

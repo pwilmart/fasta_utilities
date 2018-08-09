@@ -400,24 +400,24 @@ class GUI:
         # reverse sort next time
         tv.heading(col, command=lambda col_=col: self.sort_num_column(tv, col_, not reverse))
     
-    def move_to_left(self):
+    def drop_from_right(self):
         """Movies entry(ies) from right treeview to left."""
         selection = self.tree_right.selection()  # creates sets with elements "I001", etc.
         
         for selected in selection:
             selected_copy = self.tree_right.item(selected)  # creates a set of dicts
             self.tree_right.delete(selected)
-            self.tree_left.insert('', 'end', values=selected_copy['values'])
         self.update_status_bar("{} dropped".format(selected_copy['values'][0]))
 
-    def move_to_right(self):
+    def copy_to_right(self):
         """Movies entry(ies) from left treeview to right."""
         selection = self.tree_left.selection()  
-        
+
+        right_tree_data = [self.tree_right.item(x) for x in self.tree_right.get_children()]     
         for selected in selection:
             selected_copy = self.tree_left.item(selected)
-            self.tree_left.delete(selected)
-            self.tree_right.insert('', 'end', values=selected_copy['values'])
+            if not selected_copy in right_tree_data:
+                self.tree_right.insert('', 'end', values=selected_copy['values'])
         self.update_status_bar("{} added".format(selected_copy['values'][0]))  # Species name should be first
 
     # loading and saving species list function
@@ -747,7 +747,7 @@ class GUI:
         button_names = ["Add Proteome(s)", "Drop Proteome(s)",
                         "Save Default Species", "Load Default Species",
                         "Download", "Quit"]
-        button_commands = [self.move_to_right, self.move_to_left,
+        button_commands = [self.copy_to_right, self.drop_from_right,
                            self.save_defaults, self.select_defaults_and_load,
                            self.download_databases, self.quit_gui]
         btn_width = 18
