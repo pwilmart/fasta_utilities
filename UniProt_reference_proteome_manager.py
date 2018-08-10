@@ -28,7 +28,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 """
 # debugging and minor edits -PW 8/2/2017
 # added support for different contaminant databases -PW 8/9/2018
-# added options for longer or shoter file/folder names -PW 8/9/2018
+# added options for format of file/folder names -PW 8/9/2018
 # added option for downloading canonical only -PW 8/9/2018
 # default species list now gets updated sequence counts -PW 8/9/2018
 
@@ -179,6 +179,7 @@ class GUI:
         self.kingdom_paths = kingdom_paths      # List of directory names where files are located (kingdoms)
         self.kingdom_selections = []            # List of subpaths user specified
         self.all_entries = []                   # List of selected entry object attributes
+        self.selected_entries = []              # holds filtered subset of all_entries
         self.banned_full = banned_list          # Full ist of extra file patterns to be skipped when downloading
         self.banned_list = banned_list          # List of extra file patterns to be skipped when downloading
         self.date = ""                          # This should be a UniProt version (i.e. 2017.07 for July, 2017 release)        
@@ -353,6 +354,11 @@ class GUI:
         # Filter on species name substring
         self.selected_entries = [entry for entry in self.selected_entries if species_entry in entry.species_name.lower()]
 
+    def select_entry_values(self, entry):
+        """Selects fields from entry for treeview display."""
+        return [entry.tax_ID, entry.oscode, int(entry.main_fasta),
+                int(entry.additional_fasta), entry.kingdom, entry.species_name]
+
     def get_filtered_proteome_list(self):
         """Filters reference proteome list by user specified criteria for left side display box.
         """
@@ -368,15 +374,13 @@ class GUI:
                 return None
                     
         # Only show relevant info to user in entries
-        entries = [[entry.tax_ID, int(entry.main_fasta), int(entry.additional_fasta),
-                    entry.kingdom, entry.species_name]
-                    for entry in self.selected_entries]
+        entry_values = [self.select_entry_values(entry) for entry in self.selected_entries]
 
         # Clear entries before importing
         for row in self.tree_left.get_children():
             self.tree_left.delete(row)
-        for entry in sorted(entries):
-            self.tree_left.insert('', 'end', values=entry)
+        for entry_value in sorted(entry_values):
+            self.tree_left.insert('', 'end', values=entry_value)
 
         self.update_status_bar("List updated with %s entries" % len(self.selected_entries))        
         
@@ -482,6 +486,13 @@ class GUI:
                                                    'Select a default species list file')
         self.load_defaults()
                         
+    def index_all_entries(self):
+        """Creates a dictionary of display values for species from updated entries."""
+        species_values = {}
+        for entry in self.all_entries:
+            species_values[int(entry.tax_ID)] = self.select_entry_values(entry)
+        return species_values
+
     def load_defaults(self, display=True):
         """Load right species list from file."""
         try:
@@ -505,17 +516,15 @@ class GUI:
             for row in self.tree_right.get_children():
                     self.tree_right.delete(row)
 
+        # get updated values for default species
+        species_values = self.index_all_entries()
+
         loaded_databases = []
         for database in databases:
             # load the right list from the defaults
             database = database[1:-1]   # trim brackets
             tax = int(database.split(', ')[0])
-            canonical = int(database.split(', ')[1])
-            additional = int(database.split(', ')[2])
-            kingdom = database.split(', ')[3][1:-1]     # trim quotes
-            species_name = database.split(', ')[4][1:-1]    # trim quotes
-            species_name = species_name.rstrip(r"""'\"*""")
-            loaded_databases.append([tax, canonical, additional, kingdom, species_name])
+            loaded_databases.append(species_values[tax])
 
         loaded_databases = sorted(loaded_databases, key=lambda x: x[0]) # sort DBs by taxon
 
@@ -525,7 +534,7 @@ class GUI:
 
         return loaded_databases
 
-    def update_defaults(self):
+    def update_saved_defaults(self):
         """If the entries in right tree do not match current defaults file, ask user to save updated list"""
         right_tree_items = [self.tree_right.item(entry)['values'] for entry in self.tree_right.get_children()]
 
@@ -568,80 +577,27 @@ class GUI:
 
         if decoy_contams or target_contams:        
             reverse_fasta.main(fasta_file, forward, reverse, both, contam_path=contam_location)
-            
-    def download_canonical(self):
+
+    def download_all_databases(self):
+        """Fetches the canonical only database files for the selected species."""
+        self.login()    # Refresh the FTP connection
+
+        # update the banned list
+        self.banned_list = self.banned_full
+        self.banned_list.remove("additional")
+
+        # downlaod
+        self.download_databases()
+             
+    def download_canonical_databases(self):
         """Fetches the canonical only database files for the selected species."""
         self.login()    # Refresh the FTP connection
 
         # update the banned list
         self.banned_list = self.banned_full
         
-        # Throw warning if no databases selected
-        if len(self.tree_right.get_children()) == 0:
-            messagebox.showwarning("Empty Selection", "No databases were selected for download!")
-            return None  # Exit function
-            
-        # Get parent folder location for database download
-        self.abs_download_path = fasta_lib.get_folder(self.script_path,
-                                                      'Select parent folder for database downloads')
-        if not self.abs_download_path:
-            return None
-
-        # Make a separate folder to contain all files
-        uniprot_dir_name = r"UniProt_{}".format(self.date)
-        uniprot_dir_path = os.path.join(self.abs_download_path, uniprot_dir_name)
-        try:
-            os.mkdir(uniprot_dir_path)
-        except FileExistsError:
-            pass
-        os.chdir(uniprot_dir_path)
-
-        # Get taxonomy ID numbers for right (download) list
-        tax_id_list = [self.tree_right.item(entry)['values'][0] for entry in self.tree_right.get_children()]
-        set_tax_id_list = list(set(tax_id_list))  # remove duplicates (if any)
-        if len(tax_id_list) != len(set_tax_id_list):
-            messagebox.showwarning("Duplicates found!", "Duplicate databases were selected and will be ignored!")
-
-        # Get the entry objects for the right taxonomy numbers
-        download_entries = [entry for entry in self.all_entries if int(entry.tax_ID) in set_tax_id_list]
-
-        # Add normalized folder name attribute
-        [entry.make_folder_name(self.date) for entry in download_entries]
-
-        for entry in download_entries:
-            # Move to the FTP site branch where files are located
-            self.ftp.cwd(entry.ftp_file_path)
-                
-            # Set local location for the download
-            download_folder = os.path.join(uniprot_dir_path, entry.download_folder_name)
-            try:
-                os.mkdir(download_folder)
-                os.chdir(download_folder)
-            except FileExistsError:
-                os.chdir(download_folder)
-            except OSError:
-                print("OSError")
-                print('Download for this entry failed:')
-                entry._snoop()
-                continue
-
-            # Download reference proteome database(s)
-            for file in entry.ftp_download_list:
-                # Skip any files that we do not want to download                    
-                if self.banned_file(file):
-                    continue
-                
-                # Download the file (overwrites any existing files)
-                fixed_file = "{}_{}".format(self.date, file)
-                self.update_status_bar("Downloading {} file".format(file))
-                self.ftp.retrbinary('RETR {}'.format(file), open('{}'.format(file), 'wb').write)
-                print("{} is done downloading".format(file))
-                os.rename(os.path.join(download_folder, file), os.path.join(download_folder, fixed_file))
-
-            self.make_fasta_files(uniprot_dir_path, entry)
-
-        messagebox.showinfo("All Downloads Completed!", "Downloads Finished!")
-        self.update_status_bar("Done downloading")
+        # downlaod
+        self.download_databases()
 
     def download_databases(self):
         """Fetches the database files for the selected species."""
@@ -801,7 +757,7 @@ class GUI:
     def quit_gui(self):
         """Quits the GUI application."""
         self.logout()   # Close the FTP connection
-        self.update_defaults()
+        self.update_saved_defaults()
         self.root.withdraw()
         self.root.update_idletasks()
         self.root.destroy()
@@ -885,8 +841,8 @@ class GUI:
         entry_frame.pack(side=TOP, fill=BOTH, expand=YES, padx=5, pady=5)
 
         # set tighter columns so species is easier to see
-        col_width = {"TAX ID": 80, "CANONICAL #": 80, "ISOFORM #": 80}
-        int_cols = ["TAX ID", "CANONICAL #", "ISOFORM #"]
+        col_width = {"TAX ID": 70, "OSCODE": 70, "CANONICAL #": 70, "ISOFORM #": 70}
+        int_cols = ["TAX ID", "OSCODE", "CANONICAL #", "ISOFORM #"]
 
         # Left Window
         left_tree_frame = LabelFrame(entry_frame, text="Reference Proteomes")
@@ -929,7 +885,8 @@ class GUI:
                         "Download Canonical", "Download All", "Quit"]
         button_commands = [self.copy_to_right, self.drop_from_right,
                            self.save_defaults, self.select_defaults_and_load,
-                           self.download_canonical, self.download_databases, self.quit_gui]
+                           self.download_canonical_databases, self.download_all_databases,
+                           self.quit_gui]
         btn_width = 18
 
         # Create buttons
@@ -999,7 +956,7 @@ if __name__ == '__main__':
     URL = 'ftp.uniprot.org'
     REF_PROT_PATH = '/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/'
     KINGDOM_PATHS = ('Archaea', 'Bacteria', 'Eukaryota', 'Viruses')
-    HEADERS = ["TAX ID", "CANONICAL #", "ISOFORM #", "KINGDOM", "SPECIES NAME"]
+    HEADERS = ["TAX ID", "OSCODE", "CANONICAL #", "ISOFORM #", "KINGDOM", "SPECIES NAME"]
     BANNED = ["DNA", "gene2acc", "idmapping", "additional"]
 
     # get location where script is launched from on local computer
