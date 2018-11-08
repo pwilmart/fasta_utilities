@@ -39,6 +39,7 @@ from tkinter import messagebox
 from tkinter import filedialog
 import os
 import sys
+import time
 import ftplib
 import datetime
 import re
@@ -210,6 +211,29 @@ class GUI:
         except:
             pass # Catch error if no FTP connection to close (already timed out)
 
+    def _fetch_README(self):
+        """fetches the README file from FTP site with error testing and retries.
+        Has a hard failure if file cannot be downloaded."""
+        retry = 0
+        listing = []
+        while retry < 10:
+            try:
+                self.login()
+                self.ftp.cwd(self.ref_prot_path)  # move into README file location
+                self.ftp.retrlines('RETR README', listing.append)
+                print('...REAME was retrieved OK')
+                return listing
+            except:
+                # wait 15 seconds and retry
+                time.sleep(15)
+                retry += 1
+                print('...fetching README retry:', retry)
+
+        # ftp connection not working so terminate
+        if retry == 10:
+            print('...FATAL: unable to make FTP connection. Try again later.')
+            self.quit_gui(True)        
+
     # ReadMeEntry support         
     def load_all_entries(self):
         """Loads reference proteome entries from pickle file.
@@ -224,13 +248,8 @@ class GUI:
         date = self.data["Date"]
         entries = self.data["Entries"]
 
-        # check the current README file and see if pickled entries are current
-        self.login()
-        self.ftp.cwd(self.ref_prot_path)  # move into README file location
-        listing = []
-        self.ftp.retrlines('RETR README', listing.append)
-
         # Get the release version information from README
+        listing = self._fetch_README()
         for line in listing:
             if "release" in line.lower():
                 version = line.replace(',', '')
@@ -270,12 +289,8 @@ class GUI:
         if self.load_all_entries():
             return     # exits here if pickled entries were OK
         else:
-            # fetch and parse README
-            self.ftp.cwd(self.ref_prot_path)  
-            listing = []
-            self.ftp.retrlines('RETR README', listing.append)
-
             # get the release version information
+            listing = self._fetch_README()
             for line in listing:
                 if "release" in line.lower():
                     version = line.replace(',', '')
@@ -302,11 +317,27 @@ class GUI:
         for kingdom in self.kingdom_paths:
             kingdom_proteome = {}
             kingdom_path = self.ref_prot_path + kingdom
-            self.ftp.cwd(kingdom_path)  # Move into category location
 
+            retry = 0
             listing = []    # To hold file listing
-            self.ftp.retrlines('LIST', listing.append)   # Get the listing and save
+            while retry < 10:
+                try:
+                    self.login()
+                    self.ftp.cwd(kingdom_path)  # Move into category location
+                    self.ftp.retrlines('LIST', listing.append)   # Get the listing and save
+                    print('...%s listing was retrieved OK' % kingdom)
+                    break
+                except:
+                    # wait 15 seconds and retry
+                    time.sleep(15)
+                    retry += 1
+                    print('...fetching %s retry: %d' % (kingdom, retry))
 
+            # ftp connection not working so terminate
+            if retry == 10:
+                print('...FATAL: unable to make FTP connection. Try again later.')
+                self.quit_gui(True) 
+                
             # Count the number of proteomes (each has several files)
             for line in listing:
                 line = line.strip() # Want last item, so strip EOL
@@ -580,10 +611,8 @@ class GUI:
 
     def download_all_databases(self):
         """Fetches the canonical only database files for the selected species."""
-        self.login()    # Refresh the FTP connection
-
         # update the banned list
-        self.banned_list = self.banned_full
+        self.banned_list = list(self.banned_full) # need a copy of the list
         self.banned_list.remove("additional")
 
         # downlaod
@@ -591,10 +620,8 @@ class GUI:
              
     def download_canonical_databases(self):
         """Fetches the canonical only database files for the selected species."""
-        self.login()    # Refresh the FTP connection
-
         # update the banned list
-        self.banned_list = self.banned_full
+        self.banned_list = list(self.banned_full) # need a copy of the list
         
         # downlaod
         self.download_databases()
@@ -602,10 +629,6 @@ class GUI:
     def download_databases(self):
         """Fetches the database files for the selected species."""
         self.login()    # Refresh the FTP connection
-
-        # update the banned list
-        self.banned_list = self.banned_full
-        self.banned_list.remove("additional")
         
         # Throw warning if no databases selected
         if len(self.tree_right.get_children()) == 0:
@@ -754,10 +777,11 @@ class GUI:
         self.status_bar.update_idletasks()
         self.root.after(100)
            
-    def quit_gui(self):
+    def quit_gui(self, hard_exit=False):
         """Quits the GUI application."""
         self.logout()   # Close the FTP connection
-        self.update_saved_defaults()
+        if not hard_exit:
+            self.update_saved_defaults()
         self.root.withdraw()
         self.root.update_idletasks()
         self.root.destroy()
@@ -882,7 +906,7 @@ class GUI:
         # Set button attributes
         button_names = ["Add Proteome(s)", "Drop Proteome(s)",
                         "Save Default Species", "Load Default Species",
-                        "Download Canonical", "Download All", "Quit"]
+                        "Download Canonical", "Download Canonical+Isoforms", "Quit"]
         button_commands = [self.copy_to_right, self.drop_from_right,
                            self.save_defaults, self.select_defaults_and_load,
                            self.download_canonical_databases, self.download_all_databases,
