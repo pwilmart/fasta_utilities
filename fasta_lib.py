@@ -1048,16 +1048,19 @@ class AccToTaxon(): # rename this
         
         # check for SQLITE3 database file existance
         if os.path.exists(acc_to_tax_db):
-            print('...connecting to SQLite database...')
-            try: # https://stackoverflow.com/questions/4019081/how-to-copy-a-sqlite-table-from-a-disk-database-to-a-memory-database-in-python
-                print('...copying DB to memory...')
-                self.conn = sqlite3.connect(':memory:')
-                existing = sqlite3.connect(acc_to_tax_db)
-                query = "".join(line for line in existing.iterdump())
-                self.conn.executescript(query)
-            except:
-                print('...making slow DB connection...')
-                self.conn = sqlite3.connect(acc_to_tax_db)
+            self.conn = sqlite3.connect(acc_to_tax_db)
+            
+"""This loads the sqlite3 DB into memory (26 GB!) - needs lots of RAM"""
+##            print('...connecting to SQLite database...')
+##            try: # https://stackoverflow.com/questions/4019081/how-to-copy-a-sqlite-table-from-a-disk-database-to-a-memory-database-in-python
+##                print('...copying DB to memory...')
+##                self.conn = sqlite3.connect(':memory:')
+##                existing = sqlite3.connect(acc_to_tax_db)
+##                query = "".join(line for line in existing.iterdump())
+##                self.conn.executescript(query)
+##            except:
+##                print('...making slow DB connection...')
+##                self.conn = sqlite3.connect(acc_to_tax_db)
 
         # if DB file not found, create it
         else:
