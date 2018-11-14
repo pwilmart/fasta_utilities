@@ -163,21 +163,25 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 **Ensembl Main Window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
 
-![Ensembl Main GUI window](/images/Ensembl_edited_2.jpeg)
+![Ensembl filtering controls](/images/Ensembl_edited_2.jpeg)
 
 **Filtering the proteome list and processing options.** The left list of proteomes can be filtered based on species names or taxonomy numbers. The searching is not case sensitive and does a simple "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
 
-![Ensembl Main GUI window](/images/Ensembl_edited_3.jpeg)
+![Ensembl filter for mouse](/images/Ensembl_edited_3.jpeg)
 
 **Example of how to get mouse proteomes.** The taxonomy number for mouse is 10090. If we enter that in the TAxonomy ID field, and click the Show Filtered List button, we will get 13 mouse proteomes. Ensembl has specific proteomes for 13 common mouse strains. The top one in the left list is the typical mouse genome of the most commonly used strain (C57BL/6J, I think).
 
-![Ensembl Main GUI window](/images/Ensembl_edited_4.jpeg)
+![Ensembl selecting downloads](/images/Ensembl_edited_4.jpeg)
 
 **Adding mouse to the download list with human.** If we select the first mouse line on the left, then click the Add Proteome(s) button, that proteome is added to the right window. We can click the Download button to download and process these databases.
 
-![Ensembl Main GUI window](/images/Ensembl_edited_5.jpeg)
+![Ensembl download dialog](/images/Ensembl_edited_5.jpeg)
 
 **A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context.
+
+![Ensembl file organization](/images/Ensembl_files_6.png)
+
+**Subfolder organization.** The compressed downloaded files from the Ensembl FTP site are located in the folders with species information. The decompressed databases have the ".fasta" file extensions. We did not select and processing options, so we just have the target databases without and common contaminants. There is also a log file with the information that was shown in the console window when the script ran. This window also has one of the mouse strains (left over from an earlier testing).
 
 ---
 #### Details
