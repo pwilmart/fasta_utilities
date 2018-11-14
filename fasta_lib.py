@@ -1050,7 +1050,7 @@ class AccToTaxon(): # rename this
         if os.path.exists(acc_to_tax_db):
             self.conn = sqlite3.connect(acc_to_tax_db)
             
-"""This loads the sqlite3 DB into memory (26 GB!) - needs lots of RAM"""
+            """This loads the sqlite3 DB into memory (26 GB!) - needs lots of RAM"""
 ##            print('...connecting to SQLite database...')
 ##            try: # https://stackoverflow.com/questions/4019081/how-to-copy-a-sqlite-table-from-a-disk-database-to-a-memory-database-in-python
 ##                print('...copying DB to memory...')

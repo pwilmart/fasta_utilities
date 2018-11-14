@@ -34,6 +34,8 @@ TODO:
 """
 # debugging and edits -PW 8/10/2017
 
+# may need to check release in pickle versus current on FTP site
+
 # Built-in module imports
 from tkinter import *
 from tkinter.ttk import *
@@ -99,6 +101,20 @@ class AnimalEntry:
         self.pre_assembly = p_a         # Pre-assembly information
         self.folder_name = ""           # Folder Name for each species
         self.ftp_file_path = ""         # Species ftp download path
+
+    def _dump(self):
+        """Diagnostic dump"""
+        print('\ncommon name:', self.common_name)
+        print('latin name:', self.latin_name)
+        print('tax ID:', self.tax_ID)
+        print('assembly:', self.ensembl_assembly)
+        print('accession:', self.accession)
+        print('gene build method:', self.genebuild_method)
+        print('variation DB:', self.variation_database)
+        print('regular DB:', self.reg_database)
+        print('pre-assembly:', self.pre_assembly)
+        print('folder:', self.folder_name)
+        print('ftp file path:', self.ftp_file_path)
 
 # Build GUI
 class GUI:
@@ -239,7 +255,7 @@ class GUI:
 
                 # Set animal object's folder name (ftp download path is set in remove_invalid_animals method)
                 folder_name = "{}_{}_{}".format(animal_obj.common_name, animal_obj.latin_name, animal_obj.tax_ID)
-                folder_name = folder_name.replace(" ", "-")
+                folder_name = re.sub(self.illegal_characters, "_", folder_name)
                 animal_obj.folder_name = folder_name
 
                 # save animal record
@@ -263,13 +279,11 @@ class GUI:
                 test_name = animal.latin_name.lower().replace(" ", "_")
                 if test_name not in actual_set:
                     match = self.double_check_animal(test_name, actual_list)
-                    if test_name == 'canis_lupus_familiaris':
-                        print('match:', match)
-                        print('download_path:', r"{}/{}/pep/".format(self.ensembl_prot_path, match))
                     if match:
                         download_path = r"{}/{}/pep/".format(self.ensembl_prot_path, match)
                         animal.ftp_file_path = download_path
                     else:
+                        print('unknown animal:', animal)
                         del_list.append(i)
                 else:
                     download_path = r"{}/{}/pep/".format(self.ensembl_prot_path, test_name)
@@ -405,8 +419,12 @@ class GUI:
         selection = self.tree_right.selection()  # creates sets with elements "I001", etc.
         
         for selected in selection:
+            selected_copy = self.tree_right.item(selected)
             self.tree_right.delete(selected)
-        self.update_status_bar("{} dropped".format(selected_copy['values'][0]))
+        try:
+            self.update_status_bar("{} dropped".format(selected_copy['values'][0]))
+        except UnboundLocalError:
+            print("User tried to remove a proteome even though none was selected!")
 
     def copy_to_right(self):
         """Movies entry(ies) from left treeview to right."""
@@ -417,7 +435,10 @@ class GUI:
             selected_copy = self.tree_left.item(selected) # contents of left selection
             if not selected_copy in right_tree_data:
                 self.tree_right.insert('', 'end', values=selected_copy['values'])
-        self.update_status_bar("{} added".format(selected_copy['values'][0]))  # Species name should be first
+            try:
+                self.update_status_bar("{} added".format(selected_copy['values'][0]))  # Species name should be first
+            except UnboundLocalError:
+                print("User tried to add a proteome even though none was selected!")
 
     # loading and saving species list function
     def save_defaults(self, overwrite=False):
@@ -470,7 +491,6 @@ class GUI:
             return None
         except TypeError:
             self.update_status_bar("No defaults imported/defaults could not be found")
-            # print("If self.data is None, self.data hasn't been initialized yet: ", type(self.data))
             return None
         
         # Clear selected databases before importing
@@ -546,14 +566,17 @@ class GUI:
         os.chdir(ensembl_dir_path)
 
         # Grab entries from right tree view
+        download_common_names = [self.tree_right.item(entry)['values'][0] for entry in self.tree_right.get_children()]
         download_taxid = [self.tree_right.item(entry)['values'][2] for entry in self.tree_right.get_children()]
-        set_download_taxid = list(set(download_taxid))
-        if len(download_taxid) != len(set_download_taxid):
+        download_tuples = list(zip(download_common_names, download_taxid))
+        set_download_tuples = list(set(download_tuples))
+        if len(download_tuples) != len(set_download_tuples):
             messagebox.showwarning("Duplicates found!", "Duplicate databases were selected and will be ignored!")
             
         # Create a list of selected animal objects from list of tax id's selected
-        download_entries = [entry for taxid in download_taxid for entry in self.animal_list
-                            if int(taxid) == int(entry.tax_ID)]
+        download_entries = [entry for _tuple in download_tuples for entry in self.animal_list
+                            if (int(_tuple[1]) == int(entry.tax_ID)) and
+                            (_tuple[0] == entry.common_name)]
 
         # Change ftp directory for each species
         for entry in download_entries:
@@ -580,6 +603,7 @@ class GUI:
                 if self.banned_file(fname):
                     continue
                 fixed_fname = "{}_{}_{}".format(self.version, entry.common_name, fname)
+                fixed_fname = re.sub(self.illegal_characters, "_", fixed_fname)
                 self.update_status_bar("Downloading {} file".format(fname))
                 self.ftp.retrbinary('RETR {}'.format(fname), open('{}'.format(fname), 'wb').write)
                 print("{} is done downloading".format(fname))

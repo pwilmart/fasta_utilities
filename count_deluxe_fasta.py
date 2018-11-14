@@ -1,4 +1,4 @@
-"""'count_fasta.py' Written by Phil Wilmarth, OHSU.
+"""'count_deluxe_fasta.py' Written by Phil Wilmarth, OHSU.
 
 The MIT License (MIT)
 
@@ -38,7 +38,8 @@ import fasta_lib
 def fasta_counter(fasta_file):
     """Counts entries in a FASTA protein database.
         Call with FASTA filename.
-        Checks for duplicate accessions and (optional) valid characters.
+        Checks for duplicate accessions and valid aa characters.
+        Computes protein sequence lengths, molecular weights - writes to TXT file (with DB basename)
     """
     # create a log file to mirror screen output
     _folder = os.path.split(fasta_file)[0]
@@ -66,22 +67,22 @@ def fasta_counter(fasta_file):
     summary_obj.write('Accession\tLength\tMW\n')
 
     # read proteins until EOF; NOTE: checking for errors slows program by factor of 3-4
-    while f.readNextProtein(p, check_for_errs=False):
+    while f.readNextProtein(p, check_for_errs=True):
 
         # count protein sequences
         prot += 1
         if (prot % 500000) == 0:
             print('......(%s proteins read...)' % ("{0:,d}".format(prot),))
 
-##        # check for duplicate accession
-##        dup = conflict.get(p.accession, False)
-##        if dup:
-##            for obj in write:
-##                print('\n...WARNING: %s is already in FASTA database!\n' % (p.accession,), file=obj)
-##                if p.molwtProtein(show_errs=False) == conflict[p.accession]:
-##                    print('......possible duplicated sequence...', file=obj)
-##        else:
-##            conflict[p.accession] = p.molwtProtein(show_errs=False)
+        # check for duplicate accession
+        dup = conflict.get(p.accession, False)
+        if dup:
+            for obj in write:
+                print('\n...WARNING: %s is already in FASTA database!\n' % (p.accession,), file=obj)
+                if p.molwtProtein(show_errs=False) == conflict[p.accession]:
+                    print('......possible duplicated sequence...', file=obj)
+        else:
+            conflict[p.accession] = p.molwtProtein(show_errs=False)
 
         # count number of header elements
         control_A = p.description.count(chr(1))
@@ -119,9 +120,9 @@ if __name__ == '__main__':
         if not fasta_files: sys.exit()     # cancel button repsonse
 
     # print version info, etc. (here because of the loop)
-    print('===============================================================')
-    print(' count_fasta.py, v 1.1.0, written by Phil Wilmarth, OHSU, 2017 ')
-    print('===============================================================')
+    print('======================================================================')
+    print(' count_deluxe_fasta.py, v 1.1.0, written by Phil Wilmarth, OHSU, 2018 ')
+    print('======================================================================')
 
     # call counter function for each fasta file
     print('start', time.ctime())

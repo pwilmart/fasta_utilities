@@ -146,9 +146,11 @@ class ReadMeEntry:
         with date, proteome ID, and fixed species name.
         """
         # Remove invalid folder name characters
-        fixed_name = re.sub(self.illegal_pattern, "", self.species_name).strip()
+        fixed_name = re.sub(self.illegal_pattern, " ", self.species_name).strip()
         if dash:
             fixed_name = fixed_name.replace(" ", "-")
+        else:
+            fixed_name = fixed_name.replace(" ", "_")
 
         # Make the local download folder name
         self.download_folder_name = '_'.join([date, self.proteome_ID, fixed_name])

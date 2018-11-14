@@ -1,5 +1,8 @@
 # fasta_utilities
 ## A collection of Python 3 scripts for managing protein FASTA files
+
+There can be many steps in getting a current FASTA database and preparing it for use by a search engine.  The database has to be downloaded to an appropriate location on your computer.  The database may need to be renamed to include version numbers.  The database will need to be uncompressed to a text file.  Many database releases include proteins from a large number of species and specific species subset databases (human, mouse, etc.) may need to be extracted.  Common contaminant sequences (trypsin, keratins, etc.) often need to be added.  Decoy sequences need to be created and appended to the databases when using that method of error estimation.  The version numbers, download dates, and number of protein sequences should be recorded and saved for inclusion in subsequent publications.  It is easy to make mistakes with so many steps or delay updating databases because it is too much work.  Hopefully, this set of utilities addresses many of these issues.
+
 ### Scripts and descriptions
 
 - Ensembl_fixer.py - does header line reformatting for v83 and newer Ensembl fasta databases
@@ -43,7 +46,7 @@ IDLE has a console window that runs the main Python shell. This window can be re
 
 ### Documentation
 
-This README file is the main documentation for the scripts. The utilities were written in 2010 using Python 2. The original documentation and a poster presented at the 2010 ASMS meeting are located in a "2010_documentation" folder. Much of the informations in the older documentation is still useful.
+This README file is the main documentation for the scripts. The utilities were first written in 2010 using Python 2. The original documentation and a poster presented at the 2010 ASMS meeting are located in a "2010_documentation" folder. Much of the informations in the older documentation is still useful.
 
 ## NOTE
 
@@ -124,6 +127,57 @@ NCBI is famous for the BLAST algorithm and that is powered by the infamous NCBI 
 
 NCBI made a [major change](https://ncbiinsights.ncbi.nlm.nih.gov/2016/07/15/ncbi-is-phasing-out-sequence-gis-heres-what-you-need-to-know/) to its sequence identifiers in 2016. For years (decades?) the primary key was a "gi" number (GenInfo Identifier). The gi numbers have been replaced by compound accession "dot" version [format](https://ncbiinsights.ncbi.nlm.nih.gov/2016/12/06/converting-gi-numbers-to-accession-version/). If you use any of these major database sources, formats and options do change from time to time, and it pays to visit website documentation frequently to see if there are changes.
 
+## Scripts for downloading and extracting databases
+These scripts get protein FASTA files from respective sites:
+
+- nr_get_analyze.py
+- sprot_get_analyze.py
+- uniprot_get_analyze.py
+
+They all import the fasta_lib.py module (a collection of common functions and classes). They fetch large multi-species databases from FTP sites. The NCBI nr data has grown so large that the nr_get_analyze script is painful to run. The size of nr is still growing exponentially. More direct ways to get to relevant subsets of nr are available although it would take some effort to wrapper the choices to make finding, organizing, and naming downloads convenient. The Swiss-Prot database from UniProt has not grown so quickly and extracting species from this database is still manageable. TrEMBL is large, but UniProt has done more to control the size growth. Working with Siwss-Prot and TrEMBL is still possible but it will stress test your computer and internet connection.
+
+After the above scripts have downloaded their respective databases, the number of sequences for each species are tallied and written to tab-delimited files that can be opened with a spreadsheet program to provide the necessary information to decide what sequences to extract for database searching. A support script "taxon_group_analyzer.py" provides summaries of the sequences associated with taxonomy "nodes" (e.g. rodent).
+
+There are companion extraction scripts for the multi-species database downloads listed above that can extract by taxonomy number or by text strings:
+
+- extract_by_string.py
+- nr_extract_taxon.py
+- uniprot_extract_from_one.py
+- uniprot_extract_from_both.py
+
+There are two UniProt scripts because it makes sense to get just Swiss-Prot sequences (for some species) **or** sequences from **both** Swiss-Prot and TrEMBL. You **never, ever** want to use just TrEMBL sequences. Sequences of any proteins present in Swiss-Prot for a respective species will have been removed from TrEMBL during curation. **Note:** any scripts that start with lowercase were part of the original 2010 utilities and the Word files in the 2010_documentation folder will have more detailed documentation.
+
+In 2017, a summer student (Delan Huang) and I created a couple of GUI scripts to help get [reference proteomes](https://www.uniprot.org/help/reference_proteome) from UniProt and to get [Ensembl vertebrate](https://uswest.ensembl.org/index.html) databases.
+
+- UniProt_reference_proteome_manager.py
+  - fasta_lib.py
+  - reverse_fasta.py
+- Ensembl_proteome_manager.py
+  - fasta_lib.py
+  - Ensembl_fixer.py
+
+## Ensembl proteome manager
+This script uses a GUI window (in addition to some console output) to show you the list of vertebrate species in the current Ensembl release (149 proteomes as of 11/12/2018). There are options to filter the list of proteomes to find those of interest. And options to add contaminants and/or decoys to the downloaded databases. Different contaminant databases can be used. The list of downloaded proteomes can be saved so that those species can be updated more easily. File and folder naming is done automatically to append release information and keep the downloaded databases organized. The FASTA header lines in Ensembl databases are not very friendly for typical researches (my opinion) and they are reformatted and shortened to be more useful.
+
+![Ensembl Main GUI window](/images/Ensembl_edited_1.jpeg)
+
+**Ensembl Main Window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
+
+![Ensembl Main GUI window](/images/Ensembl_edited_2.jpeg)
+
+**Filtering the proteome list and processing options.** The left list of proteomes can be filtered bases on species names or taxonomy numbers. The searching is not case sensitive and does an "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
+
+![Ensembl Main GUI window](/images/Ensembl_edited_3.jpeg)
+
+**Example of how to get mouse proteomes.** The taxonomy number for mouse is 10090. If we enter that in the TAxonomy ID field, and click the Show Filtered List button, we will get 13 mouse proteomes. Ensembl has specific proteomes for 13 common mouse strains. The top one in the left list is the typical mouse genome of the most commonly used strain (C57BL/6J, I think).
+
+![Ensembl Main GUI window](/images/Ensembl_edited_4.jpeg)
+
+**Adding mouse to the download list with human.** If we select the first mouse line on the left, then click the Add Proteome(s) button, that proteome is added to the right window. We can click the Download button to download and process these databases.
+
+![Ensembl Main GUI window](/images/Ensembl_edited_5.jpeg)
+
+**A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context. 
 
 ---
 #### Details
