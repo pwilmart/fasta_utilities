@@ -134,7 +134,7 @@ These scripts get protein FASTA files from respective sites:
 - sprot_get_analyze.py
 - uniprot_get_analyze.py
 
-They all import the fasta_lib.py module (a collection of common functions and classes). They fetch large multi-species databases from FTP sites. The NCBI nr data has grown so large that the nr_get_analyze script is painful to run. The size of nr is still growing exponentially. More direct ways to get to relevant subsets of nr are available although it would take some effort to wrapper the choices to make finding, organizing, and naming downloads convenient. The Swiss-Prot database from UniProt has not grown so quickly and extracting species from this database is still manageable. TrEMBL is large, but UniProt has done more to control the size growth. Working with Siwss-Prot and TrEMBL is still possible but it will stress test your computer and internet connection.
+They all import the fasta_lib.py module (a collection of common functions and classes). They fetch large multi-species databases from FTP sites. The NCBI nr data has grown so large that the nr_get_analyze script is painful to run. The size of nr is still growing exponentially. More direct ways to get to relevant subsets of nr are available, although it would take some effort to wrapper the choices to make finding, organizing, and naming downloads convenient. The Swiss-Prot database from UniProt has not grown so quickly and extracting species from this database is still manageable. TrEMBL is large, but UniProt has done more to control the size growth. Working with Siwss-Prot and TrEMBL is still possible but it will stress test your computer and internet connection.
 
 After the above scripts have downloaded their respective databases, the number of sequences for each species are tallied and written to tab-delimited files that can be opened with a spreadsheet program to provide the necessary information to decide what sequences to extract for database searching. A support script "taxon_group_analyzer.py" provides summaries of the sequences associated with taxonomy "nodes" (e.g. rodent).
 
@@ -165,7 +165,7 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ![Ensembl Main GUI window](/images/Ensembl_edited_2.jpeg)
 
-**Filtering the proteome list and processing options.** The left list of proteomes can be filtered bases on species names or taxonomy numbers. The searching is not case sensitive and does an "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
+**Filtering the proteome list and processing options.** The left list of proteomes can be filtered based on species names or taxonomy numbers. The searching is not case sensitive and does a simple "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
 
 ![Ensembl Main GUI window](/images/Ensembl_edited_3.jpeg)
 
@@ -177,7 +177,7 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ![Ensembl Main GUI window](/images/Ensembl_edited_5.jpeg)
 
-**A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context. 
+**A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context.
 
 ---
 #### Details
