@@ -181,7 +181,7 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ![Ensembl file organization](/images/Ensembl_files_6.png)
 
-**Subfolder organization.** The compressed downloaded files from the Ensembl FTP site are located in the folders with species information. The decompressed databases have the ".fasta" file extensions. We did not select and processing options, so we just have the target databases without and common contaminants. There is also a log file with the information that was shown in the console window when the script ran. This window also has one of the mouse strains (left over from an earlier testing).
+**Subfolder organization.** The compressed downloaded files from the Ensembl FTP site are located in the folders with species information. The decompressed databases have the ".fasta" file extensions. We did not select any processing options, so we just have the target databases without any common contaminants. There is also a log file with the information that was shown in the console window when the script ran. This window also has one of the mouse strains (left over from an earlier testing).
 
 ---
 #### Details
