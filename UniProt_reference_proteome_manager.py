@@ -908,12 +908,12 @@ class GUI:
         # Set button attributes
         button_names = ["Add Proteome(s)", "Drop Proteome(s)",
                         "Save Default Species", "Load Default Species",
-                        "Download Canonical", "Download Canonical+Isoforms", "Quit"]
+                        "Download Canonical", "Download Canon.+Isoforms", "Quit"]
         button_commands = [self.copy_to_right, self.drop_from_right,
                            self.save_defaults, self.select_defaults_and_load,
                            self.download_canonical_databases, self.download_all_databases,
                            self.quit_gui]
-        btn_width = 18
+        btn_width = 19
 
         # Create buttons
         for btn_name, btn_command in zip(button_names, button_commands):

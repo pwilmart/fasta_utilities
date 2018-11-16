@@ -156,32 +156,86 @@ In 2017, a summer student (Delan Huang) and I created a couple of GUI scripts to
   - fasta_lib.py
   - Ensembl_fixer.py
 
-## Ensembl proteome manager
+## Ensembl Proteome Manager
 This script uses a GUI window (in addition to some console output) to show you the list of vertebrate species in the current Ensembl release (149 proteomes as of 11/12/2018). There are options to filter the list of proteomes to find those of interest. And options to add contaminants and/or decoys to the downloaded databases. Different contaminant databases can be used. The list of downloaded proteomes can be saved so that those species can be updated more easily. File and folder naming is done automatically to append release information and keep the downloaded databases organized. The FASTA header lines in Ensembl databases are not very friendly for typical researches (my opinion) and they are reformatted and shortened to be more useful.
 
-![Ensembl Main GUI window](/images/Ensembl_edited_1.jpeg)
+![Ensembl Main GUI window](/images/Ensembl_1_main_edited.jpeg)
 
 **Ensembl Main Window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
 
-![Ensembl filtering controls](/images/Ensembl_edited_2.jpeg)
+![Ensembl filtering controls](/images/Ensembl_2_top_edited.jpeg)
 
 **Filtering the proteome list and processing options.** The left list of proteomes can be filtered based on species names or taxonomy numbers. The searching is not case sensitive and does a simple "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
 
-![Ensembl filter for mouse](/images/Ensembl_edited_3.jpeg)
+![Ensembl filter for mouse](/images/Ensembl_3_mouse_edited.jpeg)
 
 **Example of how to get mouse proteomes.** The taxonomy number for mouse is 10090. If we enter that in the TAxonomy ID field, and click the Show Filtered List button, we will get 13 mouse proteomes. Ensembl has specific proteomes for 13 common mouse strains. The top one in the left list is the typical mouse genome of the most commonly used strain (C57BL/6J, I think).
 
-![Ensembl selecting downloads](/images/Ensembl_edited_4.jpeg)
+![Ensembl selecting downloads](/images/Ensembl_4_add_edited.jpeg)
 
 **Adding mouse to the download list with human.** If we select the first mouse line on the left, then click the Add Proteome(s) button, that proteome is added to the right window. We can click the Download button to download and process these databases.
 
-![Ensembl download dialog](/images/Ensembl_edited_5.jpeg)
+![Ensembl download dialog](/images/Ensembl_5_download_edited.jpeg)
 
 **A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context.
 
-![Ensembl file organization](/images/Ensembl_files_6.png)
+![Ensembl file organization](/images/Ensembl_6_files.png)
 
 **Subfolder organization.** The compressed downloaded files from the Ensembl FTP site are located in the folders with species information. The decompressed databases have the ".fasta" file extensions. We did not select any processing options, so we just have the target databases without any common contaminants. There is also a log file with the information that was shown in the console window when the script ran. This window also has one of the mouse strains (left over from an earlier testing).
+
+## UniProt Reference Proteome Manager
+
+UniProt has several ways to find and download databases. The main web site options are the easiest to find and use. They have limitations, however. There is a [UniProt FTP](https://www.uniprot.org/downloads) site that is often overlooked. There is a reduced list of higher quality reference proteomes, for example. There are (as of 11/15/2018) 439 archaea, 8895 bacteria, 1184 eukaryota, and 6178 virus reference proteomes available via FTP. The sequence collections for each species are split into a canonical set (sort of a one gene one protein idea) and (optionally) any additional isoforms of canonical proteins.
+
+Protein databases available through the main web site are split into reviewed sequences (Swiss-Prot entries) and unreviewed entries (TrEMBL entries). Swiss-Prot (and only Swiss-Prot) entries can have optional annotated isoforms. The canonical sequence collections contain both Swiss-Prot and TrEMBL entries to make up "complete" proteomes. The higher eukaryotic canonical proteomes all have around 21000 sequences, for example. These canonical databases are, therefore, reasonably complete with minimal peptide redundancy. These databases are particularly good choices for shotgun quantitative proteomics data.
+
+There are README files that provide the mappings from the species names and taxonomy numbers to the UniProt proteome numbers. The actual FTP file listings only have the proteome numbers. This can make finding the right databases to download a little challenging. This script gets information from the FTP site and presents it in a more human friendly format. There is automatic folder creation and file naming logic to help keep databases organized and make sure that the UniProt release information is captured. There are also some convenience options to add common contaminants and decoy sequences.      
+
+![UniProt main window](/images/UniProt_1_main_edited.jpeg)
+
+**UniProt Reference Proteome Main Window.** There is a top pane for controlling what proteomes are presented in the left list of the lower pane. Different kingdoms can be selected, species names can be restricted to specific species names, and taxonomy numbers can also be restricted to those of interest. After downloading databases, they can be processed to add contaminants or decoys (and contaminants). The user can select different contaminant databases if desired.
+
+The bottom pane has available proteomes listed on the left, and the desired databases to download on the right. The right list can be saved as a default list that loads when the GUI launches. There are controls to move proteomes from the left to the right, to drop proteomes from the right list, and download the databases. Databases can be downloaded as canonical sequences only, or canonical sequences and isoform sequences. If isoforms are downloaded, they will be automatically added to the canonical sequences to make a single combined protein FASTA database.
+
+![UniProt bovine species search](/images/UniProt_2A_bovine_edited.jpeg)
+
+**Filtering for Bovine (cow) Sequences.** We can restrict the kingdom to Eukaryota by unchecking the other kingdom boxes. We can require that the species name contain "bovine" (a case insensitive "in" test), and click the Show Filtered List button.
+
+![UniProt left list filtered](/images/UniProt_2B_bovine_edited.jpeg)
+
+**Left List Updates.** We now have just two possible proteomes on the left. We can select the bovine proteome (taxonomy 9913) and click the Add Proteome(s) button.
+
+![UniProt moved to right](/images/UniProt_2C_bovine_edited.jpeg)
+
+**Bovine Proteome Added to Right List.** The bovine proteome has been added to our download list. The right list has some species loaded from our default list that we do not need.
+
+![UniProt select to drop](/images/UniProt_3A_drop_edited.jpeg)
+
+**Drop Some Proteomes.** We can select the mouse, rat, yeast, and E. coli rows and then click the Drop Proteome(s) button to remove them.
+
+![UniProt right updated and download](/images/UniProt_3B_drop_edited.jpeg)
+
+**Ready to Download Databases.** We are ready to download some protein databases to test if there are human proteins that make us behave more like a herd of cattle, a flock of sheep, or if we really are just a bunch of dirty little pigs. We will download just the canonical sequences and we will add decoys and contaminants so the databases are ready to use with a search engine program, such as [Comet](http://comet-ms.sourceforge.net/).
+
+![UniProt download dialog](/images/UniProt_4A_download_edited.jpeg)
+
+**Specify the Download Location.** We want to select a folder where we will keep all of our UniProt protein database. Subfolder creation, naming, and file naming will be taken care of by the script.
+
+![UniProt console](/images/UniProt_4B_download_edited.jpeg)
+
+**Console Window also has Information.** Download progress is logged to the console window with details on filenames, locations, and sequence counts.
+
+![UniProt after download and quit](/images/UniProt_4C_download_edited.jpeg)
+
+**Quit after Downloads Finish.** The status bar and a dialog alert box will let you know when downloads have finished. If you do not have any additional databases to download, it is time to quit. Click the quit button or close the GUI window. You may also want to quit your Python 3 shell.
+
+![UniProt update defaults](/images/UniProt_5_defaults_edited.jpeg)
+
+**Right List can be Saved.** The right list might be a collection of species that you want to download on a regular basis. If the current right list differs from the previously saved list, you will be asked if you want to save the changes.
+
+![UniProt files](/images/UniProt_6_files_edited.jpeg)
+
+**Example of What Downloaded Files/Folder Look Like.** The compressed download files are saved in nicely named folders. The downloaded files are decompressed, descriptively named, and any selected processing performed. A FASTA file of the downloaded database is always created in addition to any desired processed versions (with decoys or contaminants). A log file is also present.
 
 ---
 #### Details
