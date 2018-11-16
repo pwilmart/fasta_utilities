@@ -92,11 +92,17 @@ The general reading logic for a FASTA file goes something like this:
 
 After reading a FASTA file, there will be a collection of sequence entries. Each entry will have a protein sequence string, an accession key, and an (optional) description string. Each accession should be unique to serve as a potential key in a hashed data structure. The scope of uniqueness has to be at least the original FASTA file, but there may be reasons to extend the scope (e.g. a search engine that accepts multiple FASTA files). There are typically additional structure and/or restrictions for each of these parts of a FASTA entry.
 
+### Protein Sequence
+
 The amino acid sequence can consist of the usual 20 amino acid characters, and a few other characters. There are two less common amino acid characters (O and U), and some symbols for ambiguous situations. Some older sequencing methods convert amines to acids so that N and D are indistinguishable (as are Q and E). The symbols B and Z denote the two indistinguishable amide/acid cases, respectively. J denotes indistinguishable I/L. X denotes one (or more) unknown amino acids. The are two valid special characters: "\*" denotes a stop codon (these are not always at the end of sequences - and most sequences do not end in a \*), and "\-" denotes a gap of unknown length. One of the great mysteries in life is what does each of the popular search engines do when they encounter these valid characters that are not one of the 20 canonical residue symbols. B and Z can be handled by splitting the difference in the residue masses that differ by 0.984 Da. This worked okay when we did not have high mass accuracy instruments. I and L are the same mass so J is a pretty easy edge case. X is a good head scratcher because they are many possibilities in theory and (it seems) each search engine tries to pick a different one to implement. SEQUEST from Thermo uses Leucine in place of X. Mascot tries all 20 amino acids. I do not know what other search engines do with X. The situations is even more unclear for "\*" and "\-".
 
 Different sources for protein databases can have different likelihoods of having these less common characters present in the amino acid sequences. One strategy is to test protein databases for these characters and see if there is anything to worry about. Filtering sequences before searching might be needed if the search engine has issues with certain characters. We will leave this topic unresolved and move on.
 
+### Accessions
+
 The accession is often a composite string composed of multiple elements separated by a joining character ("|" and "\_" are common). Some of these elements can be relatively unique and some not so much. In the above example sequences, [UniProt accession format](https://www.uniprot.org/help/fasta-headers) is a database designation, a stable accession, and a more human friendly identifier (e.g. 'tr|A0A087WNZ6|A0A087WNZ6_MOUSE'). The "tr" denotes a TrEMBL entry (an unreviewed entry; "sp" denotes a reviewed Swiss-Prot entry), "A0A087WNZ6" is the stable accession string, and "A0A087WNZ6_MOUSE" is the concatenated gene symbol and species OS code. NCBI and other database sources use different accession formats that are described in their manuals and help pages. Decoy sequences often have modified accessions based on the original accessions with prefix or suffix elements. Like most composite database keys, the constituent elements carry no guarantee of uniqueness. Only the combination of the constituent elements is guaranteed to be unique. Historically, some sort of regular expression parsing of accessions seems to be the norm. This can have consequences because the simplified parts of the accession that are retained may not be unique. If parsing is done before search engine processing, the parsed accessions need to be tested for uniqueness. It is also common in database searching to add common laboratory contaminant sequences and decoy sequences for error estimates. Any regular expression parsing rule has to be flexible enough for all types of accessions that will be encountered (contaminants can be the most variable), or the extra FASTA entries (contaminants and decoys) have to be formatted to have accessions compatible with the parsing expression. It is far safer to not parse accession strings until after search engine results have been compiled into protein results lists.
+
+### The rest of the header line
 
 If the sequences and accessions are not complicated enough to keep you awake at night, do not worry. The description strings more than make up for it. They are have no defined format and are only limed by the imagination of database creators, as illustrated by the [PEFF](http://www.psidev.info/peff) proposal. UniProt includes several bits of information beyond the actual protein/gene description phrase. There is commonly the species (OS=), the taxonomy number (OX=), the gene symbol (GN=), the protein evidence code (PE=), and version number (SV=). NCBI is know for its non-redundant protein database. Those databases have one sequence for all species where that protein is the same (e.g. 138 higher eukaryotic ubiquitin sequences are all identical). The NCBI entry contains all 138 FASTA header lines in one composite header line separated by Control-A characters. I have seen FASTA header line lengths of several thousand characters. Ensembl protein databases have complicated descriptions that carry a full compliment of cross-reference information on corresponding genome and transcriptome coordinates, in addition to gene symbols, protein descriptions, and sequence sources and types. The accessions also have a version number suffix.  An example sequence for human ENSP00000374886 is shown below from Ensembl release 93. Other protein database sources may have other types of information encoded into their FASTA header lines. Some detailed research is required for each source to see what information is present and if it is in a usable format for a protein researcher. There can be benefits to reformatting FASTA header descriptions into more concise and relevant strings.
 
@@ -107,7 +113,11 @@ GLQFLIHYYNGEERAKGNILERFSAQQFPDLHSELNLSSLELGDSALYFCASSV
 ```     
 
 ## Protein database sources
-The best sources for protein sequence collections depends a little on whether you are studying model systems, eukaryotes, prokaryotes, plants, parasites, etc. Some sources are genomic oriented, some are protein oriented. Some sources are dedicated to specific systems and serve as centralized resources for researchers. There are many sources of protein databases and all of them seem to be in use to some degree. The major sequence collections are described in this [Wikipedia entry](https://en.wikipedia.org/wiki/Sequence_database). [UniProt](https://www.uniprot.org/) databases are probably the most widely used protein databases in proteomics with databases from [NCBI](https://www.ncbi.nlm.nih.gov/protein) the next most common. [Ensembl](https://uswest.ensembl.org/index.html) databases can be useful if protein information is being compared with genome and transcriptome information. Ensembl genomes are often references for read alignments in next generation sequencing. There are several sources for commonly studied model systems such as [yeast](https://www.yeastgenome.org), [fruit flies](http://flybase.org), [worms](https://www.wormbase.org/#012-34-5), [disease vectors](https://www.vectorbase.org), [trypanosomes](http://tritrypdb.org/tritrypdb/), [zebrafish](https://zfin.org), and [Arabidopsis](https://www.arabidopsis.org/index.jsp). Many times these dedicated resources are the sources of the sequence collections used in the more centralized database sources. Dedicated sources provide FASTA protein database download options in many cases. It is wise to do some investigation of these databases for accession and description formats, and to see if unusual amino acid sequence characters are an issue. The centralized sources of protein databases (UniProt, NCBI, and Ensembl) have processing pipelines so that FASTA header lines have defined and consistent formats, and have had some consistent set of rules applied to the amino acid sequences (e.g. how are stop codons handled?). As the Grail Knight in [Raiders of the Lost Arc](https://www.imdb.com/title/tt0082971/) might say, "choose your protein database wisely."
+The best sources for protein sequence collections depends a little on whether you are studying model systems, eukaryotes, prokaryotes, plants, parasites, etc. Some sources are genomic oriented, some are protein oriented. Some sources are dedicated to specific systems and serve as centralized resources for researchers. There are many sources of protein databases and all of them seem to be in use to some degree. The major sequence collections are described in this [Wikipedia entry](https://en.wikipedia.org/wiki/Sequence_database). [UniProt](https://www.uniprot.org/) databases are probably the most widely used protein databases in proteomics with databases from [NCBI](https://www.ncbi.nlm.nih.gov/protein) the next most common. [Ensembl](https://uswest.ensembl.org/index.html) databases can be useful if protein information is being compared with genome and transcriptome information. Ensembl genomes are often references for read alignments in next generation sequencing.
+
+There are several sources for commonly studied model systems such as [yeast](https://www.yeastgenome.org), [fruit flies](http://flybase.org), [worms](https://www.wormbase.org/#012-34-5), [disease vectors](https://www.vectorbase.org), [trypanosomes](http://tritrypdb.org/tritrypdb/), [zebrafish](https://zfin.org), and [Arabidopsis](https://www.arabidopsis.org/index.jsp). Many times these dedicated resources are the sources of the sequence collections used in the more centralized database sources. Dedicated sources provide FASTA protein database download options in many cases. It is wise to do some investigation of these databases for accession and description formats, and to see if unusual amino acid sequence characters are an issue. The centralized sources of protein databases (UniProt, NCBI, and Ensembl) have processing pipelines so that FASTA header lines have defined and consistent formats, and have had some consistent set of rules applied to the amino acid sequences (e.g. how are stop codons handled?). As the Grail Knight in [Raiders of the Lost Arc](https://www.imdb.com/title/tt0082971/) might say, "choose your protein database wisely."
+
+Protein databases from different sources (and different databases options from the same source) can be highly variable in both total protein sequence count and the degree of peptide redundancy (we usually work with tryptic peptides). For the curious, this [Master's thesis](https://digitalcommons.ohsu.edu/etd/3855/) by Ravi Madhira explores this topic in some detail.
 
 ## UniProt sequence collections
 [UniProt](https://www.uniprot.org/help/about) has a lot of protein sequences that are grouped and organized in a variety of ways. The sequences are composed of [two sections](https://www.uniprot.org/help/uniprotkb_sections): manually reviewed Swiss-Prot sequences and computer annotated TrEMBL (unreviewed) sequences. These are denoted with "sp" and "tr" prefixes, respectively, in FASTA file accessions. UniProt has a monthly release schedule for its databases.
@@ -157,6 +167,13 @@ In 2017, a summer student (Delan Huang) and I created a couple of GUI scripts to
   - Ensembl_fixer.py
 
 ## Ensembl Proteome Manager
+
+- Ensembl_proteome_manager.py
+- fasta_lib.py
+- Ensembl_current_release.pickle
+- Ensembl_fixer.py
+- default_Ensembl_species.txt
+
 This script uses a GUI window (in addition to some console output) to show you the list of vertebrate species in the current Ensembl release (149 proteomes as of 11/12/2018). There are options to filter the list of proteomes to find those of interest. And options to add contaminants and/or decoys to the downloaded databases. Different contaminant databases can be used. The list of downloaded proteomes can be saved so that those species can be updated more easily. File and folder naming is done automatically to append release information and keep the downloaded databases organized. The FASTA header lines in Ensembl databases are not very friendly for typical researches (my opinion) and they are reformatted and shortened to be more useful.
 
 ![Ensembl Main GUI window](/images/Ensembl_1_main_edited.jpeg)
@@ -185,11 +202,17 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ## UniProt Reference Proteome Manager
 
+- UniProt_reference_proteome_manager.py
+- fasta_lib.py
+- UniProt_current_release.pickle
+- default_UniProt_species.txt
+- reverse_fasta.py
+
 UniProt has several ways to find and download databases. The main web site options are the easiest to find and use. They have limitations, however. There is a [UniProt FTP](https://www.uniprot.org/downloads) site that is often overlooked. There is a reduced list of higher quality reference proteomes, for example. There are (as of 11/15/2018) 439 archaea, 8895 bacteria, 1184 eukaryota, and 6178 virus reference proteomes available via FTP. The sequence collections for each species are split into a canonical set (sort of a one gene one protein idea) and (optionally) any additional isoforms of canonical proteins.
 
 Protein databases available through the main web site are split into reviewed sequences (Swiss-Prot entries) and unreviewed entries (TrEMBL entries). Swiss-Prot (and only Swiss-Prot) entries can have optional annotated isoforms. The canonical sequence collections contain both Swiss-Prot and TrEMBL entries to make up "complete" proteomes. The higher eukaryotic canonical proteomes all have around 21000 sequences, for example. These canonical databases are, therefore, reasonably complete with minimal peptide redundancy. These databases are particularly good choices for shotgun quantitative proteomics data.
 
-There are README files that provide the mappings from the species names and taxonomy numbers to the UniProt proteome numbers. The actual FTP file listings only have the proteome numbers. This can make finding the right databases to download a little challenging. This script gets information from the FTP site and presents it in a more human friendly format. There is automatic folder creation and file naming logic to help keep databases organized and make sure that the UniProt release information is captured. There are also some convenience options to add common contaminants and decoy sequences.      
+There are README files that provide the mappings from the species names and taxonomy numbers to the UniProt proteome numbers. The actual FTP file listings only have the proteome numbers. This can make finding the right databases to download a little challenging. This script gets information from the FTP site and presents it in a more human friendly format. There is automatic folder creation and file naming logic to help keep databases organized and make sure that the UniProt release information is captured. There are also some convenience options to add common contaminants and decoy sequences. _**Note:** The folder naming options are not yet implemented._      
 
 ![UniProt main window](/images/UniProt_1_main_edited.jpeg)
 
@@ -236,6 +259,43 @@ The bottom pane has available proteomes listed on the left, and the desired data
 ![UniProt files](/images/UniProt_6_files_edited.jpeg)
 
 **Example of What Downloaded Files/Folder Look Like.** The compressed download files are saved in nicely named folders. The downloaded files are decompressed, descriptively named, and any selected processing performed. A FASTA file of the downloaded database is always created in addition to any desired processed versions (with decoys or contaminants). A log file is also present.
+
+## Scripts for Working with Downloaded FASTA Files
+
+### add_extras_and_reverse.py
+Adds extra sequences to protein databases. The extra sequences need to be in a separate FASTA file (often only a few sequences). The accessions of the extra proteins are modified to avoid any accession conflicts. Contaminants and decoys can be added to the resulting FASTA file.
+
+### check_for_duplicates.py
+
+Checks a FASTA file for duplicated protein sequences. Produces a report of any duplicates that were found.
+
+### count_deluxe_fasta.py
+
+Counts the sequences in one or more FASTA files with valid amino acid character testing. Produces a report with sequence lengths and calculated molecular weights.
+
+### count_fasta.py
+
+Counts the sequences in one or more FASTA files.
+
+### Ensembl_fixer.py
+
+Reformats FASTA header lines in Ensembl protein databases into a more human-readable, concise line.
+
+### FASTA_digester.py
+
+Performs a theoretical digest of a FASTA protein database and produces a report of peptide redundancy (and some other statistics). The default is a tryptic digest. Script modification is necessary to support other proteases. The set of digestion options for [Comet](http://comet-ms.sourceforge.net/) are available.
+
+### remove_duplicates.py
+
+Creates a non-redundant protein database along the same lines as the nr release from NCBI. Duplicated sequences will appear once with a compound FASTA header line separated by Control-A characters.
+
+### reverse_fasta.py
+
+Adds reversed decoy sequences (and contaminants) to FASTA files. Concatenated (recommended) or separate decoy database can be produced.
+
+### TriTryp_fixer.py
+
+Does some protein sequence character checking and FASTA header line reformatting of protein data bases from [TriTryp](http://tritrypdb.org/tritrypdb/).
 
 ---
 #### Details
