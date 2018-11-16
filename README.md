@@ -178,7 +178,7 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ![Ensembl Main GUI window](/images/Ensembl_1_main_edited.jpeg)
 
-**Ensembl Main Window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
+**Ensembl main window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
 
 ![Ensembl filtering controls](/images/Ensembl_2_top_edited.jpeg)
 
@@ -216,49 +216,49 @@ There are README files that provide the mappings from the species names and taxo
 
 ![UniProt main window](/images/UniProt_1_main_edited.jpeg)
 
-**UniProt Reference Proteome Main Window.** There is a top pane for controlling what proteomes are presented in the left list of the lower pane. Different kingdoms can be selected, species names can be restricted to specific species names, and taxonomy numbers can also be restricted to those of interest. After downloading databases, they can be processed to add contaminants or decoys (and contaminants). The user can select different contaminant databases if desired.
+**UniProt reference proteome manager main window.** There is a top pane for controlling what proteomes are presented in the left list of the lower pane. Different kingdoms can be selected, species names can be restricted to specific species names, and taxonomy numbers can also be restricted to those of interest. After downloading databases, they can be processed to add contaminants or decoys (and contaminants). The user can select different contaminant databases if desired.
 
 The bottom pane has available proteomes listed on the left, and the desired databases to download on the right. The right list can be saved as a default list that loads when the GUI launches. There are controls to move proteomes from the left to the right, to drop proteomes from the right list, and download the databases. Databases can be downloaded as canonical sequences only, or canonical sequences and isoform sequences. If isoforms are downloaded, they will be automatically added to the canonical sequences to make a single combined protein FASTA database.
 
 ![UniProt bovine species search](/images/UniProt_2A_bovine_edited.jpeg)
 
-**Filtering for Bovine (cow) Sequences.** We can restrict the kingdom to Eukaryota by unchecking the other kingdom boxes. We can require that the species name contain "bovine" (a case insensitive "in" test), and click the Show Filtered List button.
+**Filtering for bovine (cow) sequences.** We can restrict the kingdom to Eukaryota by unchecking the other kingdom boxes. We can require that the species name contain "bovine" (a case insensitive "in" test), and click the Show Filtered List button.
 
 ![UniProt left list filtered](/images/UniProt_2B_bovine_edited.jpeg)
 
-**Left List Updates.** We now have just two possible proteomes on the left. We can select the bovine proteome (taxonomy 9913) and click the Add Proteome(s) button.
+**Left list will update.** We now have just two possible proteomes on the left. We can select the bovine proteome (taxonomy 9913) and click the Add Proteome(s) button.
 
 ![UniProt moved to right](/images/UniProt_2C_bovine_edited.jpeg)
 
-**Bovine Proteome Added to Right List.** The bovine proteome has been added to our download list. The right list has some species loaded from our default list that we do not need.
+**Bovine proteome added to right list.** The bovine proteome has been added to our download list. The right list has some species loaded from our default list that we do not need.
 
 ![UniProt select to drop](/images/UniProt_3A_drop_edited.jpeg)
 
-**Drop Some Proteomes.** We can select the mouse, rat, yeast, and E. coli rows and then click the Drop Proteome(s) button to remove them.
+**Drop any unneeded proteomes.** We can select the mouse, rat, yeast, and E. coli rows and then click the Drop Proteome(s) button to remove them.
 
 ![UniProt right updated and download](/images/UniProt_3B_drop_edited.jpeg)
 
-**Ready to Download Databases.** We are ready to download some protein databases to test if there are human proteins that make us behave more like a herd of cattle, a flock of sheep, or if we really are just a bunch of dirty little pigs. We will download just the canonical sequences and we will add decoys and contaminants so the databases are ready to use with a search engine program, such as [Comet](http://comet-ms.sourceforge.net/).
+**Ready to download databases.** We are ready to download some protein databases to test if there are human proteins that make us behave more like a herd of cattle, a flock of sheep, or if we really are just a bunch of dirty little pigs. We will download just the canonical sequences and we will add decoys and contaminants so the databases are ready to use with a search engine program, such as [Comet](http://comet-ms.sourceforge.net/).
 
 ![UniProt download dialog](/images/UniProt_4A_download_edited.jpeg)
 
-**Specify the Download Location.** We want to select a folder where we will keep all of our UniProt protein database. Subfolder creation, naming, and file naming will be taken care of by the script.
+**Specify the download location.** We want to select a folder where we will keep all of our UniProt protein database. Subfolder creation, naming, and file naming will be taken care of by the script.
 
 ![UniProt console](/images/UniProt_4B_download_edited.jpeg)
 
-**Console Window also has Information.** Download progress is logged to the console window with details on filenames, locations, and sequence counts.
+**Console window also has information.** Download progress is logged to the console window with details on filenames, locations, and sequence counts.
 
 ![UniProt after download and quit](/images/UniProt_4C_download_edited.jpeg)
 
-**Quit after Downloads Finish.** The status bar and a dialog alert box will let you know when downloads have finished. If you do not have any additional databases to download, it is time to quit. Click the quit button or close the GUI window. You may also want to quit your Python 3 shell.
+**Quit after downloads finish.** The status bar and a dialog alert box will let you know when downloads have finished. If you do not have any additional databases to download, it is time to quit. Click the quit button or close the GUI window. You may also want to quit your Python 3 shell.
 
 ![UniProt update defaults](/images/UniProt_5_defaults_edited.jpeg)
 
-**Right List can be Saved.** The right list might be a collection of species that you want to download on a regular basis. If the current right list differs from the previously saved list, you will be asked if you want to save the changes.
+**Right list can be saved.** The right list might be a collection of species that you want to download on a regular basis. If the current right list differs from the previously saved list, you will be asked if you want to save the changes.
 
 ![UniProt files](/images/UniProt_6_files_edited.jpeg)
 
-**Example of What Downloaded Files/Folder Look Like.** The compressed download files are saved in nicely named folders. The downloaded files are decompressed, descriptively named, and any selected processing performed. A FASTA file of the downloaded database is always created in addition to any desired processed versions (with decoys or contaminants). A log file is also present.
+**Example of what downloaded files/folder look like.** The compressed download files are saved in nicely named folders. The downloaded files are decompressed, descriptively named, and any selected processing performed. A FASTA file of the downloaded database is always created in addition to any desired processed versions (with decoys or contaminants). A log file is also present.
 
 ## Scripts for Working with Downloaded FASTA Files
 
