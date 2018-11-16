@@ -180,21 +180,31 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 **Ensembl main window.** The GUI has a frame at the top to facilitate searching for proteomes and for specifying how to process the downloaded FASTA files. The lower frame has a left side with the available proteomes and a right side with the desired proteomes to download. The center set of buttons manage the left and right lists and the downloading. There is a status bar at the bottom.
 
+---
+
 ![Ensembl filtering controls](/images/Ensembl_2_top_edited.jpeg)
 
 **Filtering the proteome list and processing options.** The left list of proteomes can be filtered based on species names or taxonomy numbers. The searching is not case sensitive and does a simple "in" test. Substrings will return results and the general idea is to make the left list a little shorter so the species of interest can be found more easily. The downloaded databases will be compressed. During decompression, common contaminants can be added from a specified contaminants FASTA file. Sequence reversed decoys can also be added. The two check box options are independent and both can be checked.
+
+---
 
 ![Ensembl filter for mouse](/images/Ensembl_3_mouse_edited.jpeg)
 
 **Example of how to get mouse proteomes.** The taxonomy number for mouse is 10090. If we enter that in the TAxonomy ID field, and click the Show Filtered List button, we will get 13 mouse proteomes. Ensembl has specific proteomes for 13 common mouse strains. The top one in the left list is the typical mouse genome of the most commonly used strain (C57BL/6J, I think).
 
+---
+
 ![Ensembl selecting downloads](/images/Ensembl_4_add_edited.jpeg)
 
 **Adding mouse to the download list with human.** If we select the first mouse line on the left, then click the Add Proteome(s) button, that proteome is added to the right window. We can click the Download button to download and process these databases.
 
+---
+
 ![Ensembl download dialog](/images/Ensembl_5_download_edited.jpeg)
 
 **A dialog box lets you select the location for Ensembl databases on your computer.** The script will take care of creating release version named subfolders. You want to pick a "container" folder for your collection of Ensembl databases. Examination of the subfolders and their contents will give you an idea of the general organization and naming scheme. Some information in the filenames is redundant with information in the folder names on purpose. When adding FASTA files to data repositories or as Supplemental files, all of the release information should be contained in the filename because the file is usually taken out of it folder path context.
+
+---
 
 ![Ensembl file organization](/images/Ensembl_6_files.png)
 
@@ -220,41 +230,61 @@ There are README files that provide the mappings from the species names and taxo
 
 The bottom pane has available proteomes listed on the left, and the desired databases to download on the right. The right list can be saved as a default list that loads when the GUI launches. There are controls to move proteomes from the left to the right, to drop proteomes from the right list, and download the databases. Databases can be downloaded as canonical sequences only, or canonical sequences and isoform sequences. If isoforms are downloaded, they will be automatically added to the canonical sequences to make a single combined protein FASTA database.
 
+---
+
 ![UniProt bovine species search](/images/UniProt_2A_bovine_edited.jpeg)
 
 **Filtering for bovine (cow) sequences.** We can restrict the kingdom to Eukaryota by unchecking the other kingdom boxes. We can require that the species name contain "bovine" (a case insensitive "in" test), and click the Show Filtered List button.
+
+---
 
 ![UniProt left list filtered](/images/UniProt_2B_bovine_edited.jpeg)
 
 **Left list will update.** We now have just two possible proteomes on the left. We can select the bovine proteome (taxonomy 9913) and click the Add Proteome(s) button.
 
+---
+
 ![UniProt moved to right](/images/UniProt_2C_bovine_edited.jpeg)
 
 **Bovine proteome added to right list.** The bovine proteome has been added to our download list. The right list has some species loaded from our default list that we do not need.
+
+---
 
 ![UniProt select to drop](/images/UniProt_3A_drop_edited.jpeg)
 
 **Drop any unneeded proteomes.** We can select the mouse, rat, yeast, and E. coli rows and then click the Drop Proteome(s) button to remove them.
 
+---
+
 ![UniProt right updated and download](/images/UniProt_3B_drop_edited.jpeg)
 
 **Ready to download databases.** We are ready to download some protein databases to test if there are human proteins that make us behave more like a herd of cattle, a flock of sheep, or if we really are just a bunch of dirty little pigs. We will download just the canonical sequences and we will add decoys and contaminants so the databases are ready to use with a search engine program, such as [Comet](http://comet-ms.sourceforge.net/).
+
+---
 
 ![UniProt download dialog](/images/UniProt_4A_download_edited.jpeg)
 
 **Specify the download location.** We want to select a folder where we will keep all of our UniProt protein database. Subfolder creation, naming, and file naming will be taken care of by the script.
 
+---
+
 ![UniProt console](/images/UniProt_4B_download_edited.jpeg)
 
 **Console window also has information.** Download progress is logged to the console window with details on filenames, locations, and sequence counts.
+
+---
 
 ![UniProt after download and quit](/images/UniProt_4C_download_edited.jpeg)
 
 **Quit after downloads finish.** The status bar and a dialog alert box will let you know when downloads have finished. If you do not have any additional databases to download, it is time to quit. Click the quit button or close the GUI window. You may also want to quit your Python 3 shell.
 
+---
+
 ![UniProt update defaults](/images/UniProt_5_defaults_edited.jpeg)
 
 **Right list can be saved.** The right list might be a collection of species that you want to download on a regular basis. If the current right list differs from the previously saved list, you will be asked if you want to save the changes.
+
+---
 
 ![UniProt files](/images/UniProt_6_files_edited.jpeg)
 
