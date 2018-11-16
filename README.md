@@ -208,6 +208,8 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 **Subfolder organization.** The compressed downloaded files from the Ensembl FTP site are located in the folders with species information. The decompressed databases have the ".fasta" file extensions. We did not select any processing options, so we just have the target databases without any common contaminants. There is also a log file with the information that was shown in the console window when the script ran. This window also has one of the mouse strains (left over from an earlier testing).
 
+---
+
 ## UniProt Reference Proteome Manager
 
 - UniProt_reference_proteome_manager.py
@@ -287,6 +289,8 @@ The bottom pane has available proteomes listed on the left, and the desired data
 ![UniProt files](/images/UniProt_6_files_edited.jpeg)
 
 **Example of what downloaded files/folder look like.** The compressed download files are saved in nicely named folders. The downloaded files are decompressed, descriptively named, and any selected processing performed. A FASTA file of the downloaded database is always created in addition to any desired processed versions (with decoys or contaminants). A log file is also present.
+
+---
 
 ## Scripts for Working with Downloaded FASTA Files
 
