@@ -160,11 +160,9 @@ There are two UniProt scripts because it makes sense to get just Swiss-Prot sequ
 In 2017, a summer student (Delan Huang) and I created a couple of GUI scripts to help get [reference proteomes](https://www.uniprot.org/help/reference_proteome) from UniProt and to get [Ensembl vertebrate](https://uswest.ensembl.org/index.html) databases.
 
 - UniProt_reference_proteome_manager.py
-  - fasta_lib.py
-  - reverse_fasta.py
+
 - Ensembl_proteome_manager.py
-  - fasta_lib.py
-  - Ensembl_fixer.py
+
 
 ## Ensembl Proteome Manager
 
