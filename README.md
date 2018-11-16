@@ -1,5 +1,5 @@
 # fasta_utilities
-## A collection of Python 3 scripts for managing protein FASTA files
+## A collection of Python scripts for managing protein FASTA files
 
 There can be many steps in getting a current FASTA database and preparing it for use by a search engine.  The database has to be downloaded to an appropriate location on your computer.  The database may need to be renamed to include version numbers.  The database will need to be uncompressed to a text file.  Many database releases include proteins from a large number of species and specific species subset databases (human, mouse, etc.) may need to be extracted.  Common contaminant sequences (trypsin, keratins, etc.) often need to be added.  Decoy sequences need to be created and appended to the databases when using that method of error estimation.  The version numbers, download dates, and number of protein sequences should be recorded and saved for inclusion in subsequent publications.  It is easy to make mistakes with so many steps or delay updating databases because it is too much work.  Hopefully, this set of utilities addresses many of these issues.
 
