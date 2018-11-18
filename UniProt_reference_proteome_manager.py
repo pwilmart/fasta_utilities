@@ -557,9 +557,11 @@ class GUI:
             # load the right list from the defaults
             database = database[1:-1]   # trim brackets
             tax = int(database.split(', ')[0])
-            loaded_databases.append(species_values[tax])
+            entry = species_values[tax]
+            entry[0] = int(entry[0])
+            loaded_databases.append(entry)
 
-        loaded_databases = sorted(loaded_databases, key=lambda x: x[0]) # sort DBs by taxon
+        loaded_databases = sorted(loaded_databases, key=lambda x: int(x[0])) # sort DBs by taxon
 
         if display:
             for database in loaded_databases: 
