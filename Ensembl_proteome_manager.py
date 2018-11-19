@@ -836,7 +836,7 @@ if __name__ == '__main__':
     HEADERS = ["COMMON NAME", "LATIN NAME", "TAX ID", "ENSEMBL ASSEMBLY"]
     BANNED = ["README", "CHECKSUMS", "abinitio.fa.gz"]
     SCRIPT_LOCATION = os.path.dirname(os.path.realpath(__file__))
-    DEFAULT_CONTAMS = 'Thermo_contams_fixed.fasta'
+    DEFAULT_CONTAMS = 'Thermo_contams.fasta'
 
     # message to user
     print('Starting Ensembl_proteome_manager.py - querying Ensembl...')

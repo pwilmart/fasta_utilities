@@ -33,6 +33,9 @@ import os
 import sys
 import fasta_lib
 
+# contaminants FASTA file name
+CONTAMS = 'Thermo_contams.fasta'
+
 # flag to parse (clean) accessions and descriptions
 # NOTE: cleaning accessions/descriptions may cause some loss of information.
 CLEAN_ACCESSIONS = False
@@ -111,11 +114,11 @@ def fasta_add_extras(extra_file, fasta_file, output_file):
 
     # now add the contaminants
     try:
-        if os.path.exists('all_contams_fixed.fasta'):
-            contams_file = 'all_contams_fixed.fasta'
+        if os.path.exists(CONTAMS):
+            contams_file = CONTAMS
         else:
             path = os.path.split(fasta_file)[0]
-            contams_file = os.path.join(path, 'all_contams_fixed.fasta')
+            contams_file = os.path.join(path, CONTAMS)
         f = fasta_lib.FastaReader(contams_file)
         contams = 0
         while f.readNextProtein(prot, check_for_errs=True):
@@ -132,7 +135,7 @@ def fasta_add_extras(extra_file, fasta_file, output_file):
             print('...there were %s contaminant entries in %s' % (contams, contams_file), file=obj)
     except:
         for obj in write:
-            print('...WARNING: "all_contams_fixed.fasta" not found!', file=obj)
+            print('...WARNING:', CONTAMS, 'not found!', file=obj)
 
     # read proteins, clean up accessions, decriptions until EOF
     # write proteins to "forward" and "reversed" files

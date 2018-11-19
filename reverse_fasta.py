@@ -52,7 +52,7 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     decoy_string = 'REV_'   # the string to denote decoy sequences
     ######################################
     # Change default contaminants file name here:
-    CONTAMS = 'Thermo_contams_fixed.fasta'
+    CONTAMS = 'Thermo_contams.fasta'
     # or pass in a "contams_path"
     ######################################
     

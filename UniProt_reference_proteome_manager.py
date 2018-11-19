@@ -989,7 +989,7 @@ if __name__ == '__main__':
 
     # get location where script is launched from on local computer
     SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
-    DEFAULT_CONTAMS = 'Thermo_contams_fixed.fasta'
+    DEFAULT_CONTAMS = 'Thermo_contams.fasta'
     
     gui = GUI(URL, REF_PROT_PATH, KINGDOM_PATHS, HEADERS, BANNED, SCRIPT_PATH, DEFAULT_CONTAMS)
     gui.create_gui()
