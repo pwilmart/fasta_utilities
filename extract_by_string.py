@@ -47,6 +47,7 @@ KEEP_UNIPROT_ID = False
 ##string_dict = { '_MYCLB':'_MYCLB', '_MYCLE':'_MYCLE' }
 ##string_dict = { '[Bacillus sp.':'Bacillus_sp' }
 string_dict = { 'Homo sapiens':'human_string'}
+string_dict = { 'Uncharacterized protein':'uncharacterized_proteins'}
 
 
 def main(string_dict):

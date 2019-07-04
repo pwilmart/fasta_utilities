@@ -223,7 +223,7 @@ class GUI:
                 self.login()
                 self.ftp.cwd(self.ref_prot_path)  # move into README file location
                 self.ftp.retrlines('RETR README', listing.append)
-                print('...REAME was retrieved OK')
+                print('...README was retrieved OK')
                 return listing
             except:
                 # wait 15 seconds and retry
@@ -915,7 +915,7 @@ class GUI:
                            self.save_defaults, self.select_defaults_and_load,
                            self.download_canonical_databases, self.download_all_databases,
                            self.quit_gui]
-        btn_width = 19
+        btn_width = 23
 
         # Create buttons
         for btn_name, btn_command in zip(button_names, button_commands):

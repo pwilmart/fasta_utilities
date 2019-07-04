@@ -78,7 +78,8 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     
     # create instances protein object and initialize counter
     prot = fasta_lib.Protein()
-    pcount = 0
+    p_read = 0
+    p_contam = 0
 
     # try to find the contaminants database file
     # If no contam file path provided, search for it in current directory
@@ -99,13 +100,13 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     if _file:
         f = fasta_lib.FastaReader(_file)
         while f.readNextProtein(prot, check_for_errs=True):
-            pcount += 1
+            p_contam += 1
             prot.printProtein(for_file_obj)
             rev = prot.reverseProtein(decoy_string)
             rev.printProtein(rev_file_obj)
         for obj in write:
             print('...there were %s contaminant entries in %s' %
-                  ("{0:,d}".format(pcount), os.path.split(_file)[1]), file=obj)
+                  ("{0:,d}".format(p_contam), os.path.split(_file)[1]), file=obj)
     else:        
         for obj in write:
             print('...WARNING: contaminants were not added', file=obj)
@@ -116,12 +117,15 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     # error checking slows program execution, turn on if needed.
     # Reading and writing sequences always removes spaces and blank lines.
     while f.readNextProtein(prot, check_for_errs=False):
-        pcount += 1
+        p_read += 1
         prot.printProtein(for_file_obj)    # write to "forward" file
         rev = prot.reverseProtein(decoy_string)
         rev.printProtein(rev_file_obj)   # write to "reversed" file
     for_file_obj.close()
     rev_file_obj.close()
+    for obj in write:
+        print('...%s proteins read from %s' %
+              ("{0:,d}".format(p_read), os.path.split(fasta_file)[1]), file=obj) 
     
     # make concatenated output file if desired and print summary stats
     if both:
@@ -139,16 +143,16 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
         both_file_obj.close()
         for obj in write:
             print('...%s total proteins written to %s' %
-                  ("{0:,d}".format(2*pcount), os.path.split(both_name)[1]), file=obj)
+                  ("{0:,d}".format(2*(p_contam+p_read)), os.path.split(both_name)[1]), file=obj)
     
     if forward:
         for obj in write:
             print('...%s proteins written to %s' %
-                  ("{0:,d}".format(pcount), os.path.split(for_name)[1]), file=obj)
+                  ("{0:,d}".format(p_contam+p_read), os.path.split(for_name)[1]), file=obj)
     if reverse:
         for obj in write:
             print('...%s proteins reversed and written to %s' %
-                  ("{0:,d}".format(pcount), os.path.split(rev_name)[1]), file=obj)
+                  ("{0:,d}".format(p_contam+p_read), os.path.split(rev_name)[1]), file=obj)
     
     # close files and delete unwanted files
     for_file_obj.close()
