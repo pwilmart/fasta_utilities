@@ -10,5 +10,6 @@ Mostly Python and Office file exclusions. -PW
 default_Ensembl_species.txt
 to_do_list.py
 .DS_Store
-old_libraries/
+__pycache__/
+old_versions/
 extra/

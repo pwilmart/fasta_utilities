@@ -300,7 +300,8 @@ class GUI:
                     self.date = version.split()[1]
         
             # Find and parse the table
-            header_index = listing.index('Proteome_ID Tax_ID  OSCODE     #(1)    #(2)    #(3)  Species Name')
+##            header_index = listing.index('Proteome_ID Tax_ID  OSCODE     #(1)    #(2)    #(3)  Species Name')
+            header_index = listing.index('Proteome_ID	Tax_ID	OSCODE	SUPERREGNUM	#(1)	#(2)	#(3)	Species Name')
             for line in listing[header_index:]:
                 try:
                     entry = ReadMeEntry(line)
