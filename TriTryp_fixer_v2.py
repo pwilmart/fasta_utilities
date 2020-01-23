@@ -67,19 +67,24 @@ while f.readNextProtein(p, check_for_errs=True):
     pcount += 1
 
     # parse the description string into a dictionary
-    items = [x.strip() for x in p.description.split('|') if x]
-    header_dict = {x.split('=')[0]: x.split('=')[1] for x in items}
-    new_desc = []
-    new_desc = [header_dict['gene_product'],
-                '(' + header_dict['location'] + ')',
-                '[' + header_dict['organism'] + ']',
-                '(' + header_dict['protein_length'] + 'aa)']
-    p.new_desc = ' '.join(new_desc)
+    try:
+        items = [x.strip() for x in p.description.split('|') if x]
+        header_dict = {x.split('=')[0]: x.split('=')[1] for x in items}
+        new_desc = []
+        new_desc = [header_dict['gene_product'],
+                    '(' + header_dict['location'] + ')',
+                    '[' + header_dict['organism'] + ']',
+                    '(' + header_dict['protein_length'] + 'aa)']
+        p.new_desc = ' '.join(new_desc)
+    except IndexError:
+        p.new_desc = p.description
 
     # test for odd amino acids, stop codons, gaps
     if not p.sequence.startswith('M'):
         no_met += 1
         p.new_desc = p.new_desc + ' (No starting Met)'
+    if p.sequence.endswith('*'):
+        p.sequence = p.sequence[:-1]
     if '*' in p.sequence:
         stop_count += 1
         cut = p.sequence.index('*')
@@ -111,12 +116,12 @@ for p in proteins:
 file_obj.close()
 
 # print out the report of oddball characters
-print(("   TriTryp database:", os.path.basename(fasta_file)))
-print(("   translations that do not start with Met:", no_met))
-print(("   translations that have premature stop codons:", stop_count))
-print(("   translations that contain gaps:", gap_count))
-print(("   total number of input sequences was:", pcount))
-print(("   total number of sequences written was:", len(proteins)))
-print(("   number of redundant sequences was:", duplicates))
+print("   TriTryp database:", os.path.basename(fasta_file))
+print("   translations that do not start with Met:", no_met)
+print("   translations that have premature stop codons:", stop_count)
+print("   translations that contain gaps:", gap_count)
+print("   total number of input sequences was:", pcount)
+print("   total number of sequences written was:", len(proteins))
+print("   number of redundant sequences was:", duplicates)
 
 # end
