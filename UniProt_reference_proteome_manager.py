@@ -31,6 +31,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 # added options for format of file/folder names -PW 8/9/2018
 # added option for downloading canonical only -PW 8/9/2018
 # default species list now gets updated sequence counts -PW 8/9/2018
+# fixed bug with overwriting if database had already been downloaded -PW 3/6/2020
 
 # Built-in module imports
 from tkinter import *
@@ -695,6 +696,8 @@ class GUI:
                 self.update_status_bar("Downloading {} file".format(file))
                 self.ftp.retrbinary('RETR {}'.format(file), open('{}'.format(file), 'wb').write)
                 print("{} is done downloading".format(file))
+                if os.path.exists(os.path.join(download_folder, fixed_file)):
+                    os.remove(os.path.join(download_folder, fixed_file))
                 os.rename(os.path.join(download_folder, file), os.path.join(download_folder, fixed_file))
 
             self.make_fasta_files(uniprot_dir_path, entry)
