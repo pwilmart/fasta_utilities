@@ -7,6 +7,7 @@ There can be many steps in getting a current FASTA database and preparing it for
 
 - Ensembl_fixer.py - does header line reformatting for v83 and newer Ensembl fasta databases
 - Ensembl_proteome_manager.py - GUI for downloading Ensembl fasta databases
+- FASTA_checker.py - checks FASTA databases for unusual characters
 - FASTA_digester.py - theoretical digestion statistics of protein databases
 - TriTryp_fixer_v2.py - reformats fasta header lines and does some sequence analysis
 - UniProt_reference_proteome_manager.py - GUI for downloading UniProt reference proteomes from the FTP site
@@ -311,7 +312,11 @@ Counts the sequences in one or more FASTA files.
 
 ### Ensembl_fixer.py
 
-Reformats FASTA header lines in Ensembl protein databases into a more human-readable, concise line.
+Reformats FASTA header lines in Ensembl protein databases into a more human-readable, concise line. Also truncates any sequences with premature stop codons at the first stop character (*).
+
+### FASTA_checker.py
+
+Checks FASTA files for unusual characters and duplicate sequences. It does not make a new database or modify the selected database.
 
 ### FASTA_digester.py
 
