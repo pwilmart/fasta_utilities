@@ -33,6 +33,7 @@ TODO:
  - Overall, program is very rough but functional
 """
 # debugging and edits -PW 8/10/2017
+# added a little to reporting species without databases. -PW 20200502
 
 # may need to check release in pickle versus current on FTP site
 
@@ -254,7 +255,7 @@ class GUI:
                                          animal[5], animal[6], animal[7], animal[8])
 
                 # Set animal object's folder name (ftp download path is set in remove_invalid_animals method)
-                folder_name = "{}_{}_{}".format(animal_obj.common_name, animal_obj.latin_name, animal_obj.tax_ID)
+                folder_name = "{}__{}__{}".format(animal_obj.common_name, animal_obj.latin_name, animal_obj.tax_ID)
                 folder_name = re.sub(self.illegal_characters, "_", folder_name)
                 animal_obj.folder_name = folder_name
 
@@ -274,6 +275,7 @@ class GUI:
         actual_set = set(actual_list)
         for i, animal in enumerate(self.animal_list):
             if animal.ensembl_assembly == '-':  # no ftp if no assembly?
+                print('no FTP files:', animal.common_name)
                 del_list.append(i)
             else:
                 test_name = animal.latin_name.lower().replace(" ", "_")
@@ -283,16 +285,18 @@ class GUI:
                         download_path = r"{}/{}/pep/".format(self.ensembl_prot_path, match)
                         animal.ftp_file_path = download_path
                     else:
-                        print('unknown animal:', animal)
+                        print('unknown animal:', animal.common_name)
                         del_list.append(i)
                 else:
                     download_path = r"{}/{}/pep/".format(self.ensembl_prot_path, test_name)
                     animal.ftp_file_path = download_path
 
         # delete list items (work backwards)
+        print('starting animal list length:', len(self.animal_list))
         del_list = del_list[::-1]
         for i in del_list:
             del(self.animal_list[i])
+        print('ending animal list length:', len(self.animal_list))
 
     def double_check_animal(self, test_name, actual_list):
         """Latin species names in table do not always match FTP folder names (gorilla and dog)"""
@@ -602,7 +606,7 @@ class GUI:
                 # Skip any files that we do not want to download
                 if self.banned_file(fname):
                     continue
-                fixed_fname = "{}_{}_{}".format(self.version, entry.common_name, fname)
+                fixed_fname = "{}__{}__{}".format(self.version, entry.common_name, fname)
                 fixed_fname = re.sub(self.illegal_characters, "_", fixed_fname)
                 self.update_status_bar("Downloading {} file".format(fname))
                 self.ftp.retrbinary('RETR {}'.format(fname), open('{}'.format(fname), 'wb').write)

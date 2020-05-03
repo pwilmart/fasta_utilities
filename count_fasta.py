@@ -31,7 +31,7 @@ Ph: 503-494-8200, FAX: 503-494-4729, Email: techmgmt@ohsu.edu.
 import os
 import sys
 import time
-import fasta_lib_Py3
+import fasta_lib
 
 
 def fasta_counter(fasta_file):

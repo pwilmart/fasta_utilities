@@ -5,27 +5,29 @@ There can be many steps in getting a current FASTA database and preparing it for
 
 ### Scripts and descriptions
 
-- Ensembl_fixer.py - does header line reformatting for v83 and newer Ensembl fasta databases
-- Ensembl_proteome_manager.py - GUI for downloading Ensembl fasta databases
-- FASTA_checker.py - checks FASTA databases for unusual characters
-- FASTA_digester.py - theoretical digestion statistics of protein databases
-- TriTryp_fixer_v2.py - reformats fasta header lines and does some sequence analysis
-- UniProt_reference_proteome_manager.py - GUI for downloading UniProt reference proteomes from the FTP site
-- add_extras_and_reverse.py - adds special sequences to protein databases
-- check_for_duplicates.py - looks for duplicate protein sequences
-- count_deluxe_fasta.py - counts entries in multiple FASTA files
-- count_fasta.py - counts entries in FASTA file
-- extract_by_string.py - creates subset databases by header line string patterns
-- fasta_lib.py - main library module
-- nr_extract_taxon.py - extracts subset databases from NCBI nr by taxonomy numbers
-- nr_get_analyze.py - downloads and analyzes NCBI nr releases
-- remove_duplicates.py - removes duplicate FASTA entries
-- reverse_fasta.py - does simple sequence reversal for decoy generation
-- sprot_get_analyze.py - downloads and analyzes UniProt Swiss-Prot releases
-- taxon_group_analyzer.py - analyzes databases by taxonomy node numbers
-- uniprot_extract_from_both.py - extracts species by taxonomy number from Swiss-Prot + TrEMBL databases
-- uniprot_extract_from_one.py - extracts species by taxonomy number from Swiss-Prot databases
-- uniprot_get_analyze.py - downloads and analyzes UniProt Swiss-Prot + TrEMBL releases
+- `Ensembl_fixer.py` - does header line reformatting for v83 and newer Ensembl fasta databases
+- `Ensembl_proteome_manager.py` - GUI for downloading Ensembl fasta databases
+- `FASTA_checker.py` - checks FASTA databases for unusual characters
+- `FASTA_digester.py` - theoretical digestion statistics of protein databases
+- `TriTryp_fixer_v2.py` - reformats fasta header lines and does some sequence analysis
+- `UniProt_reference_proteome_manager.py` - GUI for downloading UniProt reference proteomes from the FTP site
+- `add_extras_and_reverse.py` - adds special sequences to protein databases
+- `check_fasta.py` - checks for unusual amino acid characters in sequences
+- `check_fasta_dir_walk.py` - walks a directory and summarizes all of the FASTA files (specific to Ensembl downloads)
+- `check_for_duplicates.py` - looks for duplicate protein sequences
+- `count_deluxe_fasta.py` - counts entries in multiple FASTA files
+- `count_fasta.py` - counts entries in FASTA file
+- `extract_by_string.py` - creates subset databases by header line string patterns
+- `fasta_lib.py` - main library module
+- `nr_extract_taxon.py` - extracts subset databases from NCBI nr by taxonomy numbers
+- `nr_get_analyze.py` - downloads and analyzes NCBI nr releases
+- `remove_duplicates.py` - removes duplicate FASTA entries
+- `reverse_fasta.py` - does simple sequence reversal for decoy generation
+- `sprot_get_analyze.py` - downloads and analyzes UniProt Swiss-Prot releases
+- `taxon_group_analyzer.py` - analyzes databases by taxonomy node numbers
+- `uniprot_extract_from_both.py` - extracts species by taxonomy number from Swiss-Prot + TrEMBL databases
+- `uniprot_extract_from_one.py` - extracts species by taxonomy number from Swiss-Prot databases
+- `uniprot_get_analyze.py` - downloads and analyzes UniProt Swiss-Prot + TrEMBL releases
 
 
 ## Scripts require Python 3
@@ -141,37 +143,37 @@ NCBI made a [major change](https://ncbiinsights.ncbi.nlm.nih.gov/2016/07/15/ncbi
 ## Scripts for downloading and extracting databases
 These scripts get protein FASTA files from respective sites:
 
-- nr_get_analyze.py
-- sprot_get_analyze.py
-- uniprot_get_analyze.py
+- `nr_get_analyze.py`
+- `sprot_get_analyze.py`
+- `uniprot_get_analyze.py`
 
-They all import the fasta_lib.py module (a collection of common functions and classes). They fetch large multi-species databases from FTP sites. The NCBI nr data has grown so large that the nr_get_analyze script is painful to run. The size of nr is still growing exponentially. More direct ways to get to relevant subsets of nr are available, although it would take some effort to wrapper the choices to make finding, organizing, and naming downloads convenient. The Swiss-Prot database from UniProt has not grown so quickly and extracting species from this database is still manageable. TrEMBL is large, but UniProt has done more to control the size growth. Working with Siwss-Prot and TrEMBL is still possible but it will stress test your computer and internet connection.
+They all import the `fasta_lib.py` module (a collection of common functions and classes). They fetch large multi-species databases from FTP sites. The NCBI nr data has grown so large that the nr_get_analyze script is painful to run. The size of nr is still growing exponentially. More direct ways to get to relevant subsets of nr are available, although it would take some effort to wrapper the choices to make finding, organizing, and naming downloads convenient. The Swiss-Prot database from UniProt has not grown so quickly and extracting species from this database is still manageable. TrEMBL is large, but UniProt has done more to control the size growth. Working with Siwss-Prot and TrEMBL is still possible but it will stress test your computer and internet connection.
 
-After the above scripts have downloaded their respective databases, the number of sequences for each species are tallied and written to tab-delimited files that can be opened with a spreadsheet program to provide the necessary information to decide what sequences to extract for database searching. A support script "taxon_group_analyzer.py" provides summaries of the sequences associated with taxonomy "nodes" (e.g. rodent).
+After the above scripts have downloaded their respective databases, the number of sequences for each species are tallied and written to tab-delimited files that can be opened with a spreadsheet program to provide the necessary information to decide what sequences to extract for database searching. A support script `taxon_group_analyzer.py` provides summaries of the sequences associated with taxonomy "nodes" (e.g. rodent).
 
 There are companion extraction scripts for the multi-species database downloads listed above that can extract by taxonomy number or by text strings:
 
-- extract_by_string.py
-- nr_extract_taxon.py
-- uniprot_extract_from_one.py
-- uniprot_extract_from_both.py
+- `extract_by_string.py`
+- `nr_extract_taxon.py`
+- `uniprot_extract_from_one.py`
+- `uniprot_extract_from_both.py`
 
 There are two UniProt scripts because it makes sense to get just Swiss-Prot sequences (for some species) **or** sequences from **both** Swiss-Prot and TrEMBL. You **never, ever** want to use just TrEMBL sequences. Sequences of any proteins present in Swiss-Prot for a respective species will have been removed from TrEMBL during curation. **Note:** any scripts that start with lowercase were part of the original 2010 utilities and the Word files in the 2010_documentation folder will have more detailed documentation.
 
 In 2017, a summer student (Delan Huang) and I created a couple of GUI scripts to help get [reference proteomes](https://www.uniprot.org/help/reference_proteome) from UniProt and to get [Ensembl vertebrate](https://uswest.ensembl.org/index.html) databases.
 
-- UniProt_reference_proteome_manager.py
+- `UniProt_reference_proteome_manager.py`
 
-- Ensembl_proteome_manager.py
+- `Ensembl_proteome_manager.py`
 
 
 ## Ensembl Proteome Manager
 
-- Ensembl_proteome_manager.py
-- fasta_lib.py
-- Ensembl_current_release.pickle
-- Ensembl_fixer.py
-- default_Ensembl_species.txt
+- `Ensembl_proteome_manager.py`
+- `fasta_lib.py`
+- `Ensembl_current_release.pickle`
+- `Ensembl_fixer.py`
+- `default_Ensembl_species.txt`
 
 This script uses a GUI window (in addition to some console output) to show you the list of vertebrate species in the current Ensembl release (149 proteomes as of 11/12/2018). There are options to filter the list of proteomes to find those of interest. And options to add contaminants and/or decoys to the downloaded databases. Different contaminant databases can be used. The list of downloaded proteomes can be saved so that those species can be updated more easily. File and folder naming is done automatically to append release information and keep the downloaded databases organized. The FASTA header lines in Ensembl databases are not very friendly for typical researches (my opinion) and they are reformatted and shortened to be more useful.
 
@@ -213,11 +215,11 @@ This script uses a GUI window (in addition to some console output) to show you t
 
 ## UniProt Reference Proteome Manager
 
-- UniProt_reference_proteome_manager.py
-- fasta_lib.py
-- UniProt_current_release.pickle
-- default_UniProt_species.txt
-- reverse_fasta.py
+- `UniProt_reference_proteome_manager.py`
+- `fasta_lib.py`
+- `UniProt_current_release.pickle`
+- `default_UniProt_species.txt`
+- `reverse_fasta.py`
 
 UniProt has several ways to find and download databases. The main web site options are the easiest to find and use. They have limitations, however. There is a [UniProt FTP](https://www.uniprot.org/downloads) site that is often overlooked. There is a reduced list of higher quality reference proteomes, for example. There are (as of 11/15/2018) 439 archaea, 8895 bacteria, 1184 eukaryota, and 6178 virus reference proteomes available via FTP. The sequence collections for each species are split into a canonical set (sort of a one gene one protein idea) and (optionally) any additional isoforms of canonical proteins.
 
@@ -295,45 +297,47 @@ The bottom pane has available proteomes listed on the left, and the desired data
 
 ## Scripts for Working with Downloaded FASTA Files
 
-### add_extras_and_reverse.py
+### `add_extras_and_reverse.py`
 Adds extra sequences to protein databases. The extra sequences need to be in a separate FASTA file (often only a few sequences). The accessions of the extra proteins are modified to avoid any accession conflicts. Contaminants and decoys can be added to the resulting FASTA file.
+
+### `check_fasta.py`
+
+Checks FASTA files for unusual characters and duplicate sequences. It does not make a new database or modify the selected database. `check_fasta_dir_walk.py`
 
 ### check_for_duplicates.py
 
 Checks a FASTA file for duplicated protein sequences. Produces a report of any duplicates that were found.
 
-### count_deluxe_fasta.py
+### `count_deluxe_fasta.py`
 
 Counts the sequences in one or more FASTA files with valid amino acid character testing. Produces a report with sequence lengths and calculated molecular weights.
 
-### count_fasta.py
+### `count_fasta.py`
 
 Counts the sequences in one or more FASTA files.
 
-### Ensembl_fixer.py
+### `Ensembl_fixer.py`
 
 Reformats FASTA header lines in Ensembl protein databases into a more human-readable, concise line. Also truncates any sequences with premature stop codons at the first stop character (*).
 
-### FASTA_checker.py
-
-Checks FASTA files for unusual characters and duplicate sequences. It does not make a new database or modify the selected database.
-
-### FASTA_digester.py
-
+### `FASTA_digester.py`
+`
 Performs a theoretical digest of a FASTA protein database and produces a report of peptide redundancy (and some other statistics). The default is a tryptic digest. Script modification is necessary to support other proteases. The set of digestion options for [Comet](http://comet-ms.sourceforge.net/) are available.
 
-### remove_duplicates.py
+### `remove_duplicates.py`
 
 Creates a non-redundant protein database along the same lines as the nr release from NCBI. Duplicated sequences will appear once with a compound FASTA header line separated by Control-A characters.
 
-### reverse_fasta.py
+### `reverse_fasta.py`
 
 Adds reversed decoy sequences (and contaminants) to FASTA files. Concatenated (recommended) or separate decoy database can be produced.
 
-### TriTryp_fixer.py
+### `TriTryp_fixer.py`
 
 Does some protein sequence character checking and FASTA header line reformatting of protein data bases from [TriTryp](http://tritrypdb.org/tritrypdb/).
 
 ---
 #### Details
 This documentation written by Phil Wilmarth, OHSU, November 2018.
+
+Updated May 3, 2020

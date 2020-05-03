@@ -124,7 +124,7 @@ def main(fasta_file, up_one=False):
     # this should probably be generalized somehow...
     all_tags = ['pep:', 'pep scaffold:', 'pep genescaffold:', 'pep chromosome:', 'pep contig:',
                 'pep reftig:', 'pep supercontig:', 'pep ultracontig:', 'pep group:',
-                'gene:', 'transcript:', 'gene_biotype:',
+                'pep primary_assembly', 'gene:', 'transcript:', 'gene_biotype:',
                 'transcript_biotype:', 'gene_symbol:', 'description:']
 
     # read the sequences into a list
