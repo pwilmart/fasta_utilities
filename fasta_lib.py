@@ -647,7 +647,12 @@ class Protein:
             digest[i].beg, digest[i].end = match.span()
             digest[i].beg += 1
             for aa in match.group():
-                digest[i].mass += masses[aa]
+                try:
+                    digest[i].mass += masses[aa]
+                except KeyError:
+                    print('...WARNING: unrecognized amino acid character!')
+                    print('...bad character:', aa)
+                    print('...in protein:', self.accession, self.description)
             
         # test peptides and missed cleavage peptides for mass ranges and min length
         valid_digest = []
@@ -887,7 +892,7 @@ def download_ncbi(nr_folder):
                         (os.path.join(nr_folder, 'taxdump.tar.gz'),
                          'ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz') ]
     files_addresses.reverse()
-    socket.setdefaulttimeout(120.)
+    socket.setdefaulttimeout(240.)
     for (file_name, address) in files_addresses:
         if os.path.exists(file_name):
             pass
@@ -913,7 +918,7 @@ class reporter():
         
     def report(self, packets, buff, size):
         # this monitors the download progress
-        if packets % 512 == 0:
+        if packets % 4096 == 0:
             sub_total = packets * buff
             print('......%s of %s bytes (%.2f%%)' %
                   ("{0:,d}".format(sub_total), "{0:,d}".format(size), float(100*sub_total)/size))
@@ -1040,8 +1045,10 @@ class AccToTaxon(): # rename this
         self.which = 'sqlite3' # no longer needed flag
         return
 
-    def create_or_load(self, nr_folder):
+    def create_or_load_save(self, nr_folder):
         """Creates or reloads an AccToTaxon object.
+
+        old method. Not sure it worked.
         """
         # build filename
         acc_to_tax_db = os.path.join(nr_folder, 'acc_to_tax_DB.sq3')
@@ -1091,8 +1098,42 @@ class AccToTaxon(): # rename this
             self.conn.commit()  # make sure databae is fully updated
             c.close()
         return
-    
+
+    def create_or_load(self, nr_folder):
+        """Creates an AccToTaxon dictionary.
+        """
+        # initialize data structures
+        self.accession_map = {}
+        line_count = 0
+
+        # parse the mapping file
+        fname = os.path.join(nr_folder, 'prot.accession2taxid.gz')
+        for line in gzip.open(fname, mode='rt'):
+            line = line.rstrip()
+            if 'accession.version' in line:     # skip header line
+                continue
+            line_count += 1
+            if (line_count % 1000000) == 0:
+                print('......(%s acc_to_taxon lines read)' % ("{0:,d}".format(line_count),))
+                
+            # parse the accession.version and taxonomy fields
+            acc = line.split('\t')[0]
+            tax = int(line.split('\t')[2])
+
+            # save in dictionary
+            self.accession_map[acc] = tax
+        return
+
     def get(self, acc, default):
+        """Looks up taxon given an accession.
+        """
+        try:
+            tax = self.accession_map[acc]
+        except KeyError:
+            tax = default
+        return tax
+    
+    def get_save(self, acc, default):
         """Lookup of taxon number given an NCBI accession.
         Switched to SQLite database to avoid out-of-memory errors
             Phil W., 2013-7.
@@ -1105,7 +1146,7 @@ class AccToTaxon(): # rename this
             tax = default
         return tax
 
-    def close(self):
+    def close_save(self):
         """Closes SQLite database connection.
         written by Phil Wilmarth, OHSU, 2013
         """
