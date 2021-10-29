@@ -117,6 +117,8 @@ def main(fasta_file, forward=False, reverse=False, both=True, log_obj=None, cont
     # error checking slows program execution, turn on if needed.
     # Reading and writing sequences always removes spaces and blank lines.
     while f.readNextProtein(prot, check_for_errs=False):
+        if prot.sequence.endswith('*'):
+            prot.sequence = prot.sequence[:-1]
         p_read += 1
         prot.printProtein(for_file_obj)    # write to "forward" file
         rev = prot.reverseProtein(decoy_string)

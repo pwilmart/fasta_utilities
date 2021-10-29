@@ -9,6 +9,7 @@ There can be many steps in getting a current FASTA database and preparing it for
 - `Ensembl_proteome_manager.py` - GUI for downloading Ensembl fasta databases
 - `FASTA_checker.py` - checks FASTA databases for unusual characters
 - `FASTA_digester.py` - theoretical digestion statistics of protein databases
+- `FASTA_digest_unique.py` - digest a FASTA file and makes list of peptide for each protein with unique status
 - `TriTryp_fixer_v2.py` - reformats fasta header lines and does some sequence analysis
 - `UniProt_reference_proteome_manager.py` - GUI for downloading UniProt reference proteomes from the FTP site
 - `add_extras_and_reverse.py` - adds special sequences to protein databases

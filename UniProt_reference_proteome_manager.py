@@ -319,9 +319,9 @@ class GUI:
     def get_kingdoms(self):
         """Walks the kingdom FTP pages and sets additional entry attributes."""
         for kingdom in self.kingdom_paths:
-            kingdom_proteome = {}
+            print('kingdon:', kingdom)
             kingdom_path = self.ref_prot_path + kingdom
-
+            kingdom_proteome = {} # holds file names for each proteome in the kingdom
             retry = 0
             listing = []    # To hold file listing
             while retry < 10:
@@ -340,7 +340,59 @@ class GUI:
             # ftp connection not working so terminate
             if retry == 10:
                 print('...FATAL: unable to make FTP connection. Try again later.')
-                self.quit_gui(True) 
+                self.quit_gui(True)
+
+
+            # get the list of proteome subfolders
+            proteome_list = []
+            for line in listing:
+                subdir = line.strip().split()[-1] # Get the subfolder name
+                proteome_list.append(subdir)
+
+            # for each subfolder, get the file list for that proteome
+            for subdir in proteome_list:
+##                print('subdir:', subdir)
+                retry = 0
+                listing = []    # To hold file listing
+                while retry < 3:
+                    try:
+##                        self.login()
+                        self.ftp.cwd(kingdom_path + '/' + subdir)  # Move into category location
+                        self.ftp.retrlines('LIST', listing.append)   # Get the listing and save
+                        break
+                    except:
+                        # wait 5 seconds and retry
+                        time.sleep(5)
+                        retry += 1
+                        print('......fetching proteome %s retry: %d' % (subdir, retry))
+
+                # get the actual proteome file names of interest
+                for line in listing:
+                    line = line.strip() # Want last item, so strip EOL
+                    fname = line.split()[-1] # Get the file name
+                    if fname.split('_')[0].startswith('UP'):
+                        key = fname.split('_')[0]   # Parse the reference proteome string
+                        
+
+                        # Save all filenames for each species
+                        if key in kingdom_proteome:
+                            kingdom_proteome[key].append(kingdom_path + '/' + subdir '/' + fname)
+                        else:
+                            kingdom_proteome[key] = [kingdom_path + '/' + subdir '/' + fname]
+
+                kingdom_keys = list(kingdom_proteome.keys()) # convert iterator to list
+                for entry in self.all_entries:
+                    if entry.proteome_ID in kingdom_keys:
+                        entry.ftp_download_list = list(kingdom_proteome[entry.proteome_ID]) # makes copy of list
+                        entry.kingdom = kingdom
+
+            """need to do:
+                1. loop over subfolders
+                2. set dir to path+subfolder
+                3. get the list of files in the subfolder
+                4. use code below to filter the filenames
+                5. make fname a full path (kingfom_path + proteome_subdir + filename)
+                
                 
             # Count the number of proteomes (each has several files)
             for line in listing:
@@ -361,6 +413,7 @@ class GUI:
                     entry.ftp_download_list = list(kingdom_proteome[entry.proteome_ID]) # makes copy of list
                     entry.kingdom = kingdom
                     entry.ftp_file_path = kingdom_path  # save file path in new variable
+            """
 
             print(kingdom, 'count is', len(kingdom_keys))
 
@@ -670,6 +723,9 @@ class GUI:
 
         for entry in download_entries:
             # Move to the FTP site branch where files are located
+            print('==================')
+            print('path:', entry.ftp_file_path)
+            print('==================')            
             self.ftp.cwd(entry.ftp_file_path)
                 
             # Set local location for the download
@@ -685,6 +741,11 @@ class GUI:
                 entry._snoop()
                 continue
 
+            for file in entry.ftp_download_list:
+                print('==================')
+                print('file:', file)
+                print('==================')
+
             # Download reference proteome database(s)
             for file in entry.ftp_download_list:
                 # Skip any files that we do not want to download                    
@@ -694,6 +755,7 @@ class GUI:
                 # Download the file (overwrites any existing files)
                 fixed_file = "{}_{}".format(self.date, file)
                 self.update_status_bar("Downloading {} file".format(file))
+                
                 self.ftp.retrbinary('RETR {}'.format(file), open('{}'.format(file), 'wb').write)
                 print("{} is done downloading".format(file))
                 if os.path.exists(os.path.join(download_folder, fixed_file)):

@@ -745,7 +745,7 @@ class FastaReader:
             if fasta_file.endswith('.gz'):
                 self._file_obj = gzip.open(fasta_file, 'rt')
             else :
-                self._file_obj = open(fasta_file, 'r')
+                self._file_obj = open(fasta_file, 'rt')
         except IOError:
             print('   WARNING:', fasta_file, 'could not be opened!')
             raise

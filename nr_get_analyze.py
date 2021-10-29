@@ -88,7 +88,7 @@ def main(db, folder):
             line = line.rstrip()
         if line.startswith('>'):
             prot += 1
-            chunk = 1000
+            chunk = 1000000
             if (prot % chunk) == 0:
                 print('......(%s proteins read)' % ("{0:,d}".format(prot),))
             tax_list = []
